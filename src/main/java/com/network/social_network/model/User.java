@@ -33,9 +33,11 @@ public class User {
     private String lastName;
 
     private Instant created_at;
+    private Instant enabled_at;
 
-    public User(Long userId, String email, String username, String password, String firstName, String lastName, Instant created_at, Instant enabled_at) {
-        this.userId = userId;
+    private String role;
+
+    public User (String email, String username, String password, String firstName, String lastName, Instant created_at, Instant enabled_at, String role) {
         this.email = email;
         this.username = username;
         this.password = password;
@@ -43,6 +45,7 @@ public class User {
         this.lastName = lastName;
         this.created_at = created_at;
         this.enabled_at = enabled_at;
+        this.role = role;
     }
 
     public User() {
@@ -50,10 +53,6 @@ public class User {
 
     public Long getUserId() {
         return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public String getEmail() {
@@ -112,5 +111,11 @@ public class User {
         this.enabled_at = enabled_at;
     }
 
-    private Instant enabled_at;
+    public String getRole () {
+        return role;
+    }
+
+    public void setRole (String role) {
+        this.role = role;
+    }
 }
