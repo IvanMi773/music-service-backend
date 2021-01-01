@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.Date;
 
+//Todo: add roles to application
+
 @Component
 public class JwtTokenProvider {
 

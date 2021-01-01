@@ -4,6 +4,10 @@ import com.network.social_network.dto.UserDto;
 import com.network.social_network.model.User;
 import com.network.social_network.repository.UserRepository;
 import com.network.social_network.security.jwt.JwtTokenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +22,9 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     public UserService (UserRepository userRepository, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -25,7 +32,15 @@ public class UserService {
     }
 
     public String login(String username, String password) {
-        return "ad";
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+
+            return jwtTokenProvider.generateToken(username);
+        } catch (AuthenticationException e) {
+
+            System.out.println("Error with logging in");
+            return "";
+        }
     }
 
     public String register (UserDto userDto) {
