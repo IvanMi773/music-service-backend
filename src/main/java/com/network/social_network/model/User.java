@@ -1,20 +1,22 @@
 package com.network.social_network.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.time.Instant;
+import java.util.List;
 
-@Entity
+@Entity(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long id;
+
+    @OneToMany
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private List<Post> posts;
 
     @Email
     @NotEmpty(message = "Email is required")
@@ -52,7 +54,7 @@ public class User {
     }
 
     public Long getUserId() {
-        return userId;
+        return id;
     }
 
     public String getEmail() {
@@ -117,5 +119,13 @@ public class User {
 
     public void setRole (String role) {
         this.role = role;
+    }
+
+    public List<Post> getPosts () {
+        return posts;
+    }
+
+    public void setPosts (List<Post> posts) {
+        this.posts = posts;
     }
 }

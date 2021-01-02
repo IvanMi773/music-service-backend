@@ -1,7 +1,5 @@
 package com.network.social_network.dto;
 
-import java.util.List;
-
 public class UserDto {
 
     private String username;
