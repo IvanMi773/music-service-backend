@@ -18,10 +18,10 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public HttpStatus createUser(@RequestBody User user) {
-        userService.save(user);
-
-        return HttpStatus.OK;
-    }
+//    @PostMapping
+//    public HttpStatus createUser(@RequestBody User user) {
+//        userService.save(user);
+//
+//        return HttpStatus.OK;
+//    }
 }

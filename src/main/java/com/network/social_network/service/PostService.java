@@ -1,9 +1,11 @@
 package com.network.social_network.service;
 
 import com.network.social_network.dto.PostDto;
+import com.network.social_network.exception.CustomException;
 import com.network.social_network.model.Post;
 import com.network.social_network.repository.PostRepository;
 import com.network.social_network.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -25,8 +27,11 @@ public class PostService {
     }
 
     public Post getById (Long postId) {
-        //Todo: custom exception
-        Post post = postRepository.findById(postId).orElseThrow(RuntimeException::new);
+        Post post = postRepository
+                .findById(postId)
+                .orElseThrow(
+                        () -> new CustomException("Post with id " + postId + " not found", HttpStatus.NOT_FOUND)
+                );
 
         return post;
     }
@@ -35,8 +40,11 @@ public class PostService {
 
     public void createPost (PostDto postDto) {
         var post = new Post(
-                //Todo: custom exception
-                userRepository.findById(postDto.getUserId()).orElseThrow(IllegalStateException::new),
+                userRepository
+                        .findById(postDto.getUserId())
+                        .orElseThrow(
+                                () -> new CustomException("User with id " + postDto.getUserId() + " not found", HttpStatus.NOT_FOUND)
+                        ),
                 postDto.getText(),
                 postDto.getImage(),
                 Instant.now(),
@@ -47,8 +55,11 @@ public class PostService {
     }
 
     public void updatePost (Long postId, PostDto postDto) {
-        //Todo: custom exception
-        var post = postRepository.findById(postId).orElseThrow(IllegalStateException::new);
+        var post = postRepository
+            .findById(postId)
+            .orElseThrow(
+                    () -> new CustomException("Post with id " + postId + " not found", HttpStatus.NOT_FOUND)
+            );
 
         post.setText(postDto.getText());
         post.setImage(postDto.getImage());
