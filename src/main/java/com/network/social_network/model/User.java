@@ -18,6 +18,10 @@ public class User {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private List<Post> posts;
 
+    @OneToMany
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private List<Comment> comments;
+
     @Email
     @NotEmpty(message = "Email is required")
     private String email;

@@ -77,6 +77,7 @@ public class JwtTokenProvider {
 
     public boolean validateToken (String token) {
         try {
+            //Todo: when exception is throwing, send it to client. Now it outputs in console
             Jws<Claims> claimsJws = Jwts
                     .parserBuilder()
                     .setSigningKey(key)

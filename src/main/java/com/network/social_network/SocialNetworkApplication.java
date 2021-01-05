@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SocialNetworkApplication {
 
 	//Todo: notifications when user create post
-	//Todo: create model with common
+	//Todo: create model with repeated fields
 
 	public static void main(String[] args) {
 		SpringApplication.run(SocialNetworkApplication.class, args);

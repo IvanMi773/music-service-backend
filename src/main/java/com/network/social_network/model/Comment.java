@@ -1,49 +1,40 @@
 package com.network.social_network.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.Instant;
-import java.util.List;
 
-@Entity(name = "posts")
-public class Post {
+@Entity(name = "comments")
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //Todo: when get post from database, return user, who create this post
     @ManyToOne
-    @JsonIgnore
     private User user;
 
-    @OneToMany
-    @JoinColumn(name = "post_id", referencedColumnName = "id")
-    private List<Comment> comments;
+    @ManyToOne
+    private Post post;
 
-    @NotBlank(message = "Text of post is required")
+    @NotBlank(message = "Text is required")
     private String text;
-
-    @NotBlank(message = "Image is required")
-    private String image;
 
     private Instant created_at;
     private Instant updated_at;
 
-    public Post (User user, String text, String image, Instant created_at, Instant updated_at) {
+    public Comment (User user, Post post, String text, Instant created_at, Instant updated_at) {
         this.user = user;
+        this.post = post;
         this.text = text;
-        this.image = image;
         this.created_at = created_at;
         this.updated_at = updated_at;
     }
 
-    public Post () {
+    public Comment () {
     }
 
-    public Long getPostId () {
+    public Long getId () {
         return id;
     }
 
@@ -55,20 +46,20 @@ public class Post {
         this.user = user;
     }
 
+    public Post getPost () {
+        return post;
+    }
+
+    public void setPost (Post post) {
+        this.post = post;
+    }
+
     public String getText () {
         return text;
     }
 
     public void setText (String text) {
         this.text = text;
-    }
-
-    public String getImage () {
-        return image;
-    }
-
-    public void setImage (String image) {
-        this.image = image;
     }
 
     public Instant getCreated_at () {
