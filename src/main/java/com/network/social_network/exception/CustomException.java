@@ -1,7 +1,6 @@
 package com.network.social_network.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 public class CustomException extends RuntimeException {
 
@@ -13,6 +12,7 @@ public class CustomException extends RuntimeException {
         this.httpStatus = httpStatus;
     }
 
+    @Override
     public String getMessage () {
         return message;
     }

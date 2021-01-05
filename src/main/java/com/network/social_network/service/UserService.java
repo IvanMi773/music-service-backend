@@ -1,6 +1,6 @@
 package com.network.social_network.service;
 
-import com.network.social_network.dto.UserDto;
+import com.network.social_network.dto.user.UserDto;
 import com.network.social_network.exception.CustomException;
 import com.network.social_network.model.User;
 import com.network.social_network.repository.UserRepository;

@@ -1,7 +1,7 @@
 package com.network.social_network.controller.auth;
 
-import com.network.social_network.dto.UserDto;
-import com.network.social_network.security.jwt.UsernameAndPasswordAuthenticationRequest;
+import com.network.social_network.dto.user.UserDto;
+import com.network.social_network.dto.user.UserAuthenticationDto;
 import com.network.social_network.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +17,7 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/login")
-    public String login(@RequestBody UsernameAndPasswordAuthenticationRequest request) {
+    public String login(@RequestBody UserAuthenticationDto request) {
         return userService.login(request.getUsername(), request.getPassword());
     }
 

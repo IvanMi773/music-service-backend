@@ -1,4 +1,4 @@
-package com.network.social_network.dto;
+package com.network.social_network.dto.user;
 
 public class UserDto {
 

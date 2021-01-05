@@ -1,5 +1,7 @@
 package com.network.social_network.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.Instant;
@@ -11,7 +13,9 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //Todo: when get post from database, return user, who create this post
     @ManyToOne
+    @JsonIgnore
     private User user;
 
     @NotBlank(message = "Text of post is required")

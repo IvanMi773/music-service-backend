@@ -1,4 +1,4 @@
-package com.network.social_network.security.service;
+package com.network.social_network.security;
 
 import com.network.social_network.model.User;
 import com.network.social_network.repository.UserRepository;

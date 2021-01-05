@@ -1,11 +1,11 @@
-package com.network.social_network.security.jwt;
+package com.network.social_network.dto.user;
 
-public class UsernameAndPasswordAuthenticationRequest {
-    //Todo: do something with this. We have UserDto and this request
+public class UserAuthenticationDto {
+
     private String username;
     private String password;
 
-    public UsernameAndPasswordAuthenticationRequest () {
+    public UserAuthenticationDto () {
     }
 
     public String getUsername () {
