@@ -4,6 +4,7 @@ import com.network.social_network.dto.user.UserDto;
 import com.network.social_network.exception.CustomException;
 import com.network.social_network.model.User;
 import com.network.social_network.repository.UserRepository;
+import com.network.social_network.security.ApplicationUserRole;
 import com.network.social_network.security.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,8 +37,9 @@ public class UserService {
     public String login(String username, String password) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            var user = userRepository.findByUsername(username);
 
-            return jwtTokenProvider.generateToken(username);
+            return jwtTokenProvider.generateToken(username, user.getRole());
         } catch (AuthenticationException e) {
             throw new CustomException("Error with logging in", HttpStatus.BAD_REQUEST);
         }
@@ -54,11 +56,11 @@ public class UserService {
                     userDto.getLastName(),
                     new Date().toInstant(),
                     new Date().toInstant(),
-                    "Student"
+                    ApplicationUserRole.STUDENT.getRole()
             );
 
             userRepository.save(user);
-            return jwtTokenProvider.generateToken(user.getUsername());
+            return jwtTokenProvider.generateToken(user.getUsername(), user.getRole());
         } else {
             throw new CustomException("Username or email is already use", HttpStatus.BAD_REQUEST);
         }

@@ -3,7 +3,6 @@ package com.network.social_network.security.jwt;
 import com.network.social_network.exception.CustomException;
 import com.network.social_network.security.OUserDetailsService;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,12 +11,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.security.Key;
-import java.time.LocalDate;
 import java.util.Base64;
 import java.util.Date;
-
-//Todo: add roles to application
 
 @Component
 public class JwtTokenProvider {
@@ -34,13 +29,13 @@ public class JwtTokenProvider {
         key = Base64.getEncoder().encodeToString(key.getBytes());
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, String role) {
         Date validity = new Date(new Date().getTime() + validityInMilliseconds);
 
         String token = Jwts
                 .builder()
                 .setSubject(username)
-                .claim("authorities", "Student")
+                .claim("authorities", role)
                 .setIssuedAt(new Date())
                 .setExpiration(validity)
                 .signWith(SignatureAlgorithm.HS256, key)
