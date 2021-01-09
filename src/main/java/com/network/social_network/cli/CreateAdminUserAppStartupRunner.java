@@ -2,7 +2,7 @@ package com.network.social_network.cli;
 
 import com.network.social_network.model.User;
 import com.network.social_network.repository.UserRepository;
-import com.network.social_network.security.ApplicationUserRole;
+import com.network.social_network.model.UserRole;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -33,7 +33,7 @@ public class CreateAdminUserAppStartupRunner implements CommandLineRunner {
                     "admin",
                     new Date().toInstant(),
                     new Date().toInstant(),
-                    ApplicationUserRole.ADMIN.getRole()
+                    UserRole.ADMIN.getRole()
             );
 
             userRepository.save(adminUser);

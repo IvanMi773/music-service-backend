@@ -4,7 +4,7 @@ import com.network.social_network.dto.user.UserDto;
 import com.network.social_network.exception.CustomException;
 import com.network.social_network.model.User;
 import com.network.social_network.repository.UserRepository;
-import com.network.social_network.security.ApplicationUserRole;
+import com.network.social_network.model.UserRole;
 import com.network.social_network.security.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -56,7 +56,7 @@ public class UserService {
                     userDto.getLastName(),
                     new Date().toInstant(),
                     new Date().toInstant(),
-                    ApplicationUserRole.STUDENT.getRole()
+                    UserRole.STUDENT.getRole()
             );
 
             userRepository.save(user);

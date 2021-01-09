@@ -1,5 +1,7 @@
 package com.network.social_network.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -30,6 +32,7 @@ public class User {
     private String username;
 
     @NotBlank(message = "Password is required")
+    @JsonIgnore
     private String password;
 
     @NotBlank(message = "First name is required")

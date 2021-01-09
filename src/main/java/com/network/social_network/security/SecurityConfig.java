@@ -1,5 +1,6 @@
 package com.network.social_network.security;
 
+import com.network.social_network.model.UserRole;
 import com.network.social_network.security.jwt.JwtTokenFilterConfigurer;
 import com.network.social_network.security.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").not().fullyAuthenticated()
+                .antMatchers("/api/admin/**").hasAnyAuthority(UserRole.ADMIN.getRole())
                 .anyRequest().authenticated();
 
         http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
