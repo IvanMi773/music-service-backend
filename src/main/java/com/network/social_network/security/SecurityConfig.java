@@ -27,10 +27,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                //Todo: remove this
-//                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
                 .authorizeRequests()
-                .antMatchers("/api/auth/**").not().fullyAuthenticated()
+                .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/api/admin/**").hasAnyAuthority(UserRole.ADMIN.getRole())
                 .anyRequest().authenticated();
 

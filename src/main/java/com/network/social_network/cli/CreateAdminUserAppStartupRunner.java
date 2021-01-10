@@ -33,7 +33,9 @@ public class CreateAdminUserAppStartupRunner implements CommandLineRunner {
                     "admin",
                     new Date().toInstant(),
                     new Date().toInstant(),
-                    UserRole.ADMIN.getRole()
+                    UserRole.ADMIN.getRole(),
+                    false,
+                    true
             );
 
             userRepository.save(adminUser);

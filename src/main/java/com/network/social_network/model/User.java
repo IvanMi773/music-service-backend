@@ -46,7 +46,21 @@ public class User {
 
     private String role;
 
-    public User (String email, String username, String password, String firstName, String lastName, Instant created_at, Instant enabled_at, String role) {
+    private boolean isBlocked;
+    private boolean isEnabled;
+
+    public User (
+            String email,
+            String username,
+            String password,
+            String firstName,
+            String lastName,
+            Instant created_at,
+            Instant enabled_at,
+            String role,
+            boolean isBlocked,
+            boolean isEnabled
+    ) {
         this.email = email;
         this.username = username;
         this.password = password;
@@ -55,6 +69,8 @@ public class User {
         this.created_at = created_at;
         this.enabled_at = enabled_at;
         this.role = role;
+        this.isBlocked = isBlocked;
+        this.isEnabled = isEnabled;
     }
 
     public User() {
@@ -134,5 +150,29 @@ public class User {
 
     public void setPosts (List<Post> posts) {
         this.posts = posts;
+    }
+
+    public boolean getIsBlocked () {
+        return isBlocked;
+    }
+
+    public void setIsBlocked (boolean blocked) {
+        isBlocked = blocked;
+    }
+
+    public boolean getIsEnabled () {
+        return isEnabled;
+    }
+
+    public void setIsEnabled (boolean enabled) {
+        isEnabled = enabled;
+    }
+
+    public List<Comment> getComments () {
+        return comments;
+    }
+
+    public void setComments (List<Comment> comments) {
+        this.comments = comments;
     }
 }

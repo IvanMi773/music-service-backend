@@ -4,10 +4,8 @@ import com.network.social_network.dto.user.UserDto;
 import com.network.social_network.dto.user.UserAuthenticationDto;
 import com.network.social_network.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,5 +22,12 @@ public class AuthController {
     @PostMapping("/register")
     public String register(@RequestBody UserDto userDto) {
         return userService.register(userDto);
+    }
+
+    @GetMapping("/verify/{token}")
+    public HttpStatus verifyAccount(@PathVariable String token) {
+        userService.verifyAccount(token);
+
+        return HttpStatus.OK;
     }
 }

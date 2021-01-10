@@ -3,10 +3,13 @@ package com.network.social_network.service;
 import com.network.social_network.dto.user.UserDto;
 import com.network.social_network.exception.CustomException;
 import com.network.social_network.model.User;
+import com.network.social_network.model.VerificationMail;
+import com.network.social_network.model.VerificationToken;
 import com.network.social_network.repository.UserRepository;
 import com.network.social_network.model.UserRole;
+import com.network.social_network.repository.VerificationTokenRepository;
 import com.network.social_network.security.jwt.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.network.social_network.service.mail.MailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,7 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -24,14 +29,17 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final VerificationTokenRepository verificationTokenRepository;
+    private final MailService mailService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    public UserService (UserRepository userRepository, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder) {
+    public UserService (UserRepository userRepository, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, VerificationTokenRepository verificationTokenRepository, MailService mailService) {
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.verificationTokenRepository = verificationTokenRepository;
+        this.mailService = mailService;
     }
 
     public String login(String username, String password) {
@@ -55,14 +63,48 @@ public class UserService {
                     userDto.getFirstName(),
                     userDto.getLastName(),
                     new Date().toInstant(),
-                    new Date().toInstant(),
-                    UserRole.STUDENT.getRole()
+                    null,
+                    UserRole.STUDENT.getRole(),
+                    false,
+                    false
             );
 
             userRepository.save(user);
+
+            String token = generateVerificationToken(user);
+            mailService.sendMail(new VerificationMail(
+                    "Please activate your account",
+                    user.getEmail(),
+                    "localhost:8080/api/auth/verify/" + token
+            ));
+
             return jwtTokenProvider.generateToken(user.getUsername(), user.getRole());
         } else {
             throw new CustomException("Username or email is already use", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    private String generateVerificationToken (User user) {
+        String token = UUID.randomUUID().toString();
+
+        VerificationToken verificationToken = new VerificationToken(
+                token,
+                user,
+                Instant.now().plusSeconds(10800) // 3 hours
+        );
+
+        verificationTokenRepository.save(verificationToken);
+
+        return token;
+    }
+
+    public void verifyAccount (String token) {
+        VerificationToken verificationToken = verificationTokenRepository.findByToken(token).get();
+
+        String username = verificationToken.getUser().getUsername();
+        User user = userRepository.findByUsername(username);
+        user.setIsEnabled(true);
+        user.setEnabled_at(Instant.now());
+        userRepository.save(user);
     }
 }
