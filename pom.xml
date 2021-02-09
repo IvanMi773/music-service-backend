@@ -20,12 +20,6 @@
 
 	<dependencies>
 
-		<!--	Jdbc	-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jdbc</artifactId>
-		</dependency>
-
 		<!--	Jpa	-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

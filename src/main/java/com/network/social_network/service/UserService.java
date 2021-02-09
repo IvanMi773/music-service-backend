@@ -99,6 +99,7 @@ public class UserService {
     }
 
     public void verifyAccount (String token) {
+        //Todo: check if token expire
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token).get();
 
         String username = verificationToken.getUser().getUsername();
@@ -106,5 +107,7 @@ public class UserService {
         user.setIsEnabled(true);
         user.setEnabled_at(Instant.now());
         userRepository.save(user);
+
+        verificationTokenRepository.deleteById(verificationToken.getId());
     }
 }

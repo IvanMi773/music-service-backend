@@ -16,12 +16,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private List<Post> posts;
+    @OneToMany(mappedBy = "user")
+    private List<Playlist> playlists;
 
-    @OneToMany
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @OneToMany(mappedBy = "user")
     private List<Comment> comments;
 
     @Email
@@ -144,14 +142,6 @@ public class User {
         this.role = role;
     }
 
-    public List<Post> getPosts () {
-        return posts;
-    }
-
-    public void setPosts (List<Post> posts) {
-        this.posts = posts;
-    }
-
     public boolean getIsBlocked () {
         return isBlocked;
     }
@@ -172,7 +162,35 @@ public class User {
         return comments;
     }
 
+    public Long getId () {
+        return id;
+    }
+
     public void setComments (List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public List<Playlist> getPlaylists () {
+        return playlists;
+    }
+
+    public void setPlaylists (List<Playlist> playlists) {
+        this.playlists = playlists;
+    }
+
+    public boolean isBlocked () {
+        return isBlocked;
+    }
+
+    public void setBlocked (boolean blocked) {
+        isBlocked = blocked;
+    }
+
+    public boolean isEnabled () {
+        return isEnabled;
+    }
+
+    public void setEnabled (boolean enabled) {
+        isEnabled = enabled;
     }
 }

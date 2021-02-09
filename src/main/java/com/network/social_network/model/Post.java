@@ -16,12 +16,12 @@ public class Post {
 
     //Todo: when get post from database, return user, who create this post
     @ManyToOne
-    @JsonIgnore
+//    @JsonIgnore
     private User user;
 
-    @OneToMany
-    @JoinColumn(name = "post_id", referencedColumnName = "id")
-    private List<Comment> comments;
+//    @OneToMany
+//    @JoinColumn(name = "post_id", referencedColumnName = "id")
+//    private List<Comment> comments;
 
     @NotBlank(message = "Text of post is required")
     private String text;

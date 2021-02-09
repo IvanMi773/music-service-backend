@@ -26,21 +26,23 @@ public class CommentService {
     }
 
     public void createComment (CommentDto commentDto) {
-        var comment = new Comment(
-                userRepository
-                        .findById(commentDto.getUserId())
-                        .orElseThrow(
-                                () -> new CustomException("User with id " + commentDto.getUserId() + " not found", HttpStatus.NOT_FOUND)
-                        ),
-                postRepository
-                        .findById(commentDto.getPostId())
-                        .orElseThrow(
-                                () -> new CustomException("Post with id " + commentDto.getPostId() + " not found", HttpStatus.NOT_FOUND)
-                        ),
-                commentDto.getText(),
-                Instant.now(),
-                Instant.now()
-        );
+        //Todo: fix code
+//        var comment = new Comment(
+//                userRepository
+//                        .findById(commentDto.getUserId())
+//                        .orElseThrow(
+//                                () -> new CustomException("User with id " + commentDto.getUserId() + " not found", HttpStatus.NOT_FOUND)
+//                        ),
+//                postRepository
+//                        .findById(commentDto.getPostId())
+//                        .orElseThrow(
+//                                () -> new CustomException("Post with id " + commentDto.getPostId() + " not found", HttpStatus.NOT_FOUND)
+//                        ),
+//                commentDto.getText(),
+//                Instant.now(),
+//                Instant.now()
+//        );
+        var comment = new Comment();
 
         commentRepository.save(comment);
     }
@@ -63,7 +65,8 @@ public class CommentService {
     }
 
     public List<Comment> getCommentsByPostId (Long postId) {
-        return commentRepository.getCommentsByPostId(postId);
+        //Todo: fix this
+        return commentRepository.getCommentsBySongId(postId);
     }
 
     public List<Comment> getCommentsByUserId (Long userId) {

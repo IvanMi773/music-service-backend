@@ -12,10 +12,12 @@ public class Comment {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    private Post post;
+    @JoinColumn(name = "song_id", nullable = false)
+    private Song song;
 
     @NotBlank(message = "Text is required")
     private String text;
@@ -23,9 +25,9 @@ public class Comment {
     private Instant created_at;
     private Instant updated_at;
 
-    public Comment (User user, Post post, String text, Instant created_at, Instant updated_at) {
+    public Comment (User user, Song song, String text, Instant created_at, Instant updated_at) {
         this.user = user;
-        this.post = post;
+        this.song = song;
         this.text = text;
         this.created_at = created_at;
         this.updated_at = updated_at;
@@ -46,12 +48,12 @@ public class Comment {
         this.user = user;
     }
 
-    public Post getPost () {
-        return post;
+    public Song getSong () {
+        return song;
     }
 
-    public void setPost (Post post) {
-        this.post = post;
+    public void setSong (Song song) {
+        this.song = song;
     }
 
     public String getText () {
