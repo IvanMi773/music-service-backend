@@ -8,7 +8,7 @@ public class Song {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "playlist_id", nullable = false)
@@ -24,14 +24,12 @@ public class Song {
     private Long likes;
 
     public Song (
-            Long id,
             String name,
             Double duration,
             String song,
             String genre,
             Long likes
     ) {
-        this.id = id;
         this.name = name;
         this.duration = duration;
         this.song = song;

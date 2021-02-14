@@ -3,7 +3,7 @@ package com.network.social_network.dto;
 public class CommentDto {
 
     private Long userId;
-    private Long postId;
+    private Long songId;
     private String text;
 
     public Long getUserId () {
@@ -14,12 +14,12 @@ public class CommentDto {
         this.userId = userId;
     }
 
-    public Long getPostId () {
-        return postId;
+    public Long getSongId () {
+        return songId;
     }
 
-    public void setPostId (Long postId) {
-        this.postId = postId;
+    public void setSongId (Long songId) {
+        this.songId = songId;
     }
 
     public String getText () {

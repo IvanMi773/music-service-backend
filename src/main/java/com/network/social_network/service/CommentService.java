@@ -4,7 +4,7 @@ import com.network.social_network.dto.CommentDto;
 import com.network.social_network.exception.CustomException;
 import com.network.social_network.model.Comment;
 import com.network.social_network.repository.CommentRepository;
-import com.network.social_network.repository.PostRepository;
+import com.network.social_network.repository.SongRepository;
 import com.network.social_network.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,32 +17,30 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
-    private final PostRepository postRepository;
+    private final SongRepository songRepository;
 
-    public CommentService (CommentRepository commentRepository, UserRepository userRepository, PostRepository postRepository) {
+    public CommentService (CommentRepository commentRepository, UserRepository userRepository, SongRepository songRepository) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
-        this.postRepository = postRepository;
+        this.songRepository = songRepository;
     }
 
     public void createComment (CommentDto commentDto) {
-        //Todo: fix code
-//        var comment = new Comment(
-//                userRepository
-//                        .findById(commentDto.getUserId())
-//                        .orElseThrow(
-//                                () -> new CustomException("User with id " + commentDto.getUserId() + " not found", HttpStatus.NOT_FOUND)
-//                        ),
-//                postRepository
-//                        .findById(commentDto.getPostId())
-//                        .orElseThrow(
-//                                () -> new CustomException("Post with id " + commentDto.getPostId() + " not found", HttpStatus.NOT_FOUND)
-//                        ),
-//                commentDto.getText(),
-//                Instant.now(),
-//                Instant.now()
-//        );
-        var comment = new Comment();
+        var comment = new Comment(
+                userRepository
+                        .findById(commentDto.getUserId())
+                        .orElseThrow(
+                                () -> new CustomException("User with id " + commentDto.getUserId() + " not found", HttpStatus.NOT_FOUND)
+                        ),
+                songRepository
+                        .findById(commentDto.getSongId())
+                        .orElseThrow(
+                                () -> new CustomException("Post with id " + commentDto.getSongId() + " not found", HttpStatus.NOT_FOUND)
+                        ),
+                commentDto.getText(),
+                Instant.now(),
+                Instant.now()
+        );
 
         commentRepository.save(comment);
     }
@@ -64,9 +62,8 @@ public class CommentService {
         commentRepository.deleteById(commentId);
     }
 
-    public List<Comment> getCommentsByPostId (Long postId) {
-        //Todo: fix this
-        return commentRepository.getCommentsBySongId(postId);
+    public List<Comment> getCommentsBySongId (Long songId) {
+        return commentRepository.getCommentsBySongId(songId);
     }
 
     public List<Comment> getCommentsByUserId (Long userId) {

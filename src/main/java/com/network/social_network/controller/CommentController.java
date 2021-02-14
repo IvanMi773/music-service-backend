@@ -39,9 +39,9 @@ public class CommentController {
         return HttpStatus.OK;
     }
 
-    @GetMapping("/post/{postId}")
-    public List<Comment> getCommentsByPostId(@PathVariable Long postId) {
-        return commentService.getCommentsByPostId(postId);
+    @GetMapping("/song/{songId}")
+    public List<Comment> getCommentsBySongId(@PathVariable Long songId) {
+        return commentService.getCommentsBySongId(songId);
     }
 
     @GetMapping("/user/{userId}")
