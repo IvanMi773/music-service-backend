@@ -48,6 +48,8 @@ public class PlaylistService {
                 playlistDto.getPhoto(),
                 playlistDto.getState() == 0 ? PlayListState.PRIVATE : PlayListState.PUBLIC
         );
+
+        playlistRepository.save(playlist);
     }
 
     public void updatePlaylist (Long playlistId, PlaylistDto playlistDto) {

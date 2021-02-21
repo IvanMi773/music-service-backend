@@ -12,24 +12,24 @@ import java.io.IOException;
 @RestControllerAdvice
 public class GlobalExceptionHandler  {
 
-    @ExceptionHandler(CustomException.class)
-    public ResponseEntity<Object> handleCustomException(CustomException ex) {
-        return new ResponseEntity<>(ex.getMessage(), ex.getHttpStatus());
-    }
+//    @ExceptionHandler(CustomException.class)
+//    public ResponseEntity<Object> handleCustomException(CustomException ex) {
+//        return new ResponseEntity<>(ex.getMessage(), ex.getHttpStatus());
+//    }
 
 //    @ExceptionHandler(CustomException.class)
 //    public void handleCustomException(HttpServletResponse res, CustomException ex) throws IOException {
 //        res.sendError(ex.getHttpStatus().value(), "ex.getMessage()");
 //    }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public void handleAccessDeniedException(HttpServletResponse res) throws IOException {
-        res.sendError(HttpStatus.FORBIDDEN.value(), "Access denied");
-    }
+//    @ExceptionHandler(AccessDeniedException.class)
+//    public void handleAccessDeniedException(HttpServletResponse res) throws IOException {
+//        res.sendError(HttpStatus.FORBIDDEN.value(), "Access denied");
+//    }
 
-    @ExceptionHandler(Exception.class)
-    public void handleException(HttpServletResponse res) throws IOException {
-        res.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Something went wrong");
-    }
+//    @ExceptionHandler(Exception.class)
+//    public void handleException(HttpServletResponse res) throws IOException {
+//        res.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Something went wrong");
+//    }
 
 }

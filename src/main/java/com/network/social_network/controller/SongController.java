@@ -5,7 +5,9 @@ import com.network.social_network.model.Song;
 import com.network.social_network.service.SongService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -29,10 +31,19 @@ public class SongController {
     }
 
     @PostMapping
-    public HttpStatus createSong (@RequestBody SongDto songDto) {
+    public HashMap<String, String> createSong (
+            @RequestParam("playlistId") Long playlistId,
+            @RequestParam("name") String name,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("genre") String genre
+    ) {
+        var songDto = new SongDto(playlistId, name, file, genre);
         songService.createSong(songDto);
 
-        return HttpStatus.OK;
+        HashMap<String, String> response = new HashMap<>();
+        response.put("ok", String.valueOf(HttpStatus.OK));
+
+        return response;
     }
 
     @PostMapping("/{songId}")

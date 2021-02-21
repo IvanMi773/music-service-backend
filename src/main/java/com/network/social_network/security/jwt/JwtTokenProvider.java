@@ -19,7 +19,7 @@ public class JwtTokenProvider {
 
     //Todo: create secure key. Maybe move it from program
     private String key = "jwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettokenjwtsecrettoken";
-    private long validityInMilliseconds = 3600000;
+    private final long validityInMilliseconds = 36000000000l;
 
     @Autowired
     private OUserDetailsService userDetailsService;

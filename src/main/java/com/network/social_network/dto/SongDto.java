@@ -1,19 +1,19 @@
 package com.network.social_network.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class SongDto {
 
     private Long playlistId;
     private String name;
-    private String song;
+    private MultipartFile file;
     private String genre;
-    private Long likes;
 
-    public SongDto (Long playlistId, String name, String song, String genre, Long likes) {
+    public SongDto (Long playlistId, String name, MultipartFile file, String genre) {
         this.playlistId = playlistId;
         this.name = name;
-        this.song = song;
+        this.file = file;
         this.genre = genre;
-        this.likes = likes;
     }
 
     public Long getPlaylistId () {
@@ -32,12 +32,12 @@ public class SongDto {
         this.name = name;
     }
 
-    public String getSong () {
-        return song;
+    public MultipartFile getSong () {
+        return file;
     }
 
-    public void setSong (String song) {
-        this.song = song;
+    public void setSong (MultipartFile file) {
+        this.file = file;
     }
 
     public String getGenre () {
@@ -46,13 +46,5 @@ public class SongDto {
 
     public void setGenre (String genre) {
         this.genre = genre;
-    }
-
-    public Long getLikes () {
-        return likes;
-    }
-
-    public void setLikes (Long likes) {
-        this.likes = likes;
     }
 }

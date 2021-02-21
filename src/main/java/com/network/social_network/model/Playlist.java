@@ -37,6 +37,8 @@ public class Playlist {
         this.state = state;
     }
 
+    public Playlist () {}
+
     public Long getId () {
         return id;
     }

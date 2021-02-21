@@ -18,24 +18,29 @@ public class Song {
     private List<Comment> comments;
 
     private String name;
-    private Double duration;
-    private String song;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "file_id", referencedColumnName = "fileId")
+    private SongFile file;
+
     private String genre;
     private Long likes;
 
     public Song (
             String name,
-            Double duration,
-            String song,
+            SongFile file,
             String genre,
-            Long likes
+            Long likes,
+            Playlist playlist
     ) {
         this.name = name;
-        this.duration = duration;
-        this.song = song;
+        this.file = file;
         this.genre = genre;
         this.likes = likes;
+        this.playlist = playlist;
     }
+
+    public Song () {}
 
     public Long getId () {
         return id;
@@ -49,20 +54,12 @@ public class Song {
         this.name = name;
     }
 
-    public Double getDuration () {
-        return duration;
+    public SongFile getSongFile () {
+        return file;
     }
 
-    public void setDuration (Double duration) {
-        this.duration = duration;
-    }
-
-    public String getSong () {
-        return song;
-    }
-
-    public void setSong (String song) {
-        this.song = song;
+    public void setSongFile (SongFile file) {
+        this.file = file;
     }
 
     public String getGenre () {
