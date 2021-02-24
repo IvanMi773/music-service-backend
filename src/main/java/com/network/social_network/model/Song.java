@@ -23,21 +23,27 @@ public class Song {
     @JoinColumn(name = "file_id", referencedColumnName = "fileId")
     private SongFile file;
 
-    private String genre;
+    @ManyToOne
+    private Genre genre;
+
     private Long likes;
 
     public Song (
             String name,
             SongFile file,
-            String genre,
+            Genre genre,
             Long likes,
             Playlist playlist
     ) {
         this.name = name;
         this.file = file;
-        this.genre = genre;
         this.likes = likes;
         this.playlist = playlist;
+        if (genre != null) {
+            this.genre = genre;
+        } else {
+            this.genre = new Genre("none");
+        }
     }
 
     public Song () {}
@@ -62,11 +68,11 @@ public class Song {
         this.file = file;
     }
 
-    public String getGenre () {
+    public Genre getGenre () {
         return genre;
     }
 
-    public void setGenre (String genre) {
+    public void setGenre (Genre genre) {
         this.genre = genre;
     }
 

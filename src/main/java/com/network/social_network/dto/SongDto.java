@@ -7,13 +7,13 @@ public class SongDto {
     private Long playlistId;
     private String name;
     private MultipartFile file;
-    private String genre;
+    private Long genreId;
 
-    public SongDto (Long playlistId, String name, MultipartFile file, String genre) {
+    public SongDto (Long playlistId, String name, MultipartFile file, Long genreId) {
         this.playlistId = playlistId;
         this.name = name;
         this.file = file;
-        this.genre = genre;
+        this.genreId = genreId;
     }
 
     public Long getPlaylistId () {
@@ -40,11 +40,11 @@ public class SongDto {
         this.file = file;
     }
 
-    public String getGenre () {
-        return genre;
+    public Long getGenre () {
+        return genreId;
     }
 
-    public void setGenre (String genre) {
-        this.genre = genre;
+    public void setGenre (Long genreId) {
+        this.genreId = genreId;
     }
 }

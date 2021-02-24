@@ -5,6 +5,7 @@ import com.network.social_network.exception.CustomException;
 import com.network.social_network.model.Song;
 import com.network.social_network.model.SongFile;
 import com.network.social_network.repository.FilesRepository;
+import com.network.social_network.repository.GenreRepository;
 import com.network.social_network.repository.PlaylistRepository;
 import com.network.social_network.repository.SongRepository;
 import org.springframework.http.HttpStatus;
@@ -24,11 +25,13 @@ public class SongService {
     private final SongRepository songRepository;
     private final PlaylistRepository playlistRepository;
     private final FilesRepository filesRepository;
+    private final GenreRepository genreRepository;
 
-    public SongService (SongRepository songRepository, PlaylistRepository playlistRepository, FilesRepository filesRepository) {
+    public SongService (SongRepository songRepository, PlaylistRepository playlistRepository, FilesRepository filesRepository, GenreRepository genreRepository) {
         this.songRepository = songRepository;
         this.playlistRepository = playlistRepository;
         this.filesRepository = filesRepository;
+        this.genreRepository = genreRepository;
     }
 
     public List<Song> getAll () {
@@ -49,7 +52,7 @@ public class SongService {
         var song = new Song(
                 songDto.getName(),
                 songFile,
-                songDto.getGenre(),
+                genreRepository.findById(songDto.getGenre()).orElseThrow(() -> new CustomException("Genre not found", HttpStatus.NOT_FOUND)),
                 (long) 23.4,
                 playlistRepository.findById(songDto.getPlaylistId()).orElseThrow(
                         () -> new CustomException("Not found", HttpStatus.NOT_FOUND)
@@ -75,13 +78,19 @@ public class SongService {
             String path = root + "/" + filename + "." + file.getContentType().split("/")[1];
             Files.write(Paths.get(path), file.getBytes());
 
+//            path = path.replace("/", "\\");
+//            File target = new File("D:\\Projects\\music_service\\social_network\\" + path);
+//            AudioFile af = AudioFileIO.read(target);
+//            AudioHeader ah = af.getAudioHeader();
+//            System.out.println( ah.getTrackLength());
+
             SongFile model = new SongFile(filename, file.getContentType());
             filesRepository.save(model);
 
             return model;
-        } catch (IOException e) {
+        } catch (Exception e) {
             //Todo: change exception
-            throw new CustomException("err", HttpStatus.MULTI_STATUS);
+            throw new CustomException("io err", HttpStatus.MULTI_STATUS);
         }
     }
 
@@ -91,9 +100,9 @@ public class SongService {
                 () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
         );
 
-        song.setName(songDto.getName());
+//        song.setName(songDto.getName());
 //        song.setSong(songDto.getSong());
-        song.setGenre(songDto.getGenre());
+//        song.setGenre(genreRepository.findById(songDto.getGenre()).orElseThrow(() -> new CustomException("Genre not found", HttpStatus.NOT_FOUND)));
 //        song.setLikes(songDto.getLikes());
 
         songRepository.save(song);
