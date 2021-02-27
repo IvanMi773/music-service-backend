@@ -4,24 +4,24 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class SongDto {
 
-    private Long playlistId;
+    private String username;
     private String name;
     private MultipartFile file;
     private Long genreId;
 
-    public SongDto (Long playlistId, String name, MultipartFile file, Long genreId) {
-        this.playlistId = playlistId;
+    public SongDto (String username, String name, MultipartFile file, Long genreId) {
+        this.username = username;
         this.name = name;
         this.file = file;
         this.genreId = genreId;
     }
 
-    public Long getPlaylistId () {
-        return playlistId;
+    public String getUsername () {
+        return username;
     }
 
-    public void setPlaylistId (Long playlistId) {
-        this.playlistId = playlistId;
+    public void setUsername (String username) {
+        this.username = username;
     }
 
     public String getName () {

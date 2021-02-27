@@ -17,11 +17,6 @@ public class GlobalExceptionHandler  {
         return new ResponseEntity<>(ex.getMessage(), ex.getHttpStatus());
     }
 
-//    @ExceptionHandler(CustomException.class)
-//    public void handleCustomException(HttpServletResponse res, CustomException ex) throws IOException {
-//        res.sendError(ex.getHttpStatus().value(), "ex.getMessage()");
-//    }
-
     @ExceptionHandler(AccessDeniedException.class)
     public void handleAccessDeniedException(HttpServletResponse res) throws IOException {
         res.sendError(HttpStatus.FORBIDDEN.value(), "Access denied");

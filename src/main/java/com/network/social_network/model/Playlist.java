@@ -17,7 +17,7 @@ public class Playlist {
     private String name;
     private Double duration;
 
-    @OneToMany(mappedBy = "playlist")
+    @ManyToMany(mappedBy = "playlists")
     private List<Song> songs;
 
     private String photo;

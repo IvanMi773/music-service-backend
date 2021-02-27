@@ -2,12 +2,10 @@ package com.network.social_network.service;
 
 import com.network.social_network.dto.SongDto;
 import com.network.social_network.exception.CustomException;
+import com.network.social_network.model.Playlist;
 import com.network.social_network.model.Song;
 import com.network.social_network.model.SongFile;
-import com.network.social_network.repository.FilesRepository;
-import com.network.social_network.repository.GenreRepository;
-import com.network.social_network.repository.PlaylistRepository;
-import com.network.social_network.repository.SongRepository;
+import com.network.social_network.repository.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,12 +22,14 @@ import java.util.UUID;
 public class SongService {
 
     private final SongRepository songRepository;
+    private final UserRepository userRepository;
     private final PlaylistRepository playlistRepository;
     private final FilesRepository filesRepository;
     private final GenreRepository genreRepository;
 
-    public SongService (SongRepository songRepository, PlaylistRepository playlistRepository, FilesRepository filesRepository, GenreRepository genreRepository) {
+    public SongService (SongRepository songRepository, UserRepository userRepository, PlaylistRepository playlistRepository, FilesRepository filesRepository, GenreRepository genreRepository) {
         this.songRepository = songRepository;
+        this.userRepository = userRepository;
         this.playlistRepository = playlistRepository;
         this.filesRepository = filesRepository;
         this.genreRepository = genreRepository;
@@ -39,6 +40,7 @@ public class SongService {
     }
 
     public Song getSongById (Long songId) {
+        //Todo: correct exception handling
         return songRepository.findById(songId).orElseThrow(
                 () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
         );
@@ -49,15 +51,15 @@ public class SongService {
 
         var songFile = saveSong(songDto.getSong());
 
+        var user = userRepository.findByUsername(songDto.getUsername());
+
         var song = new Song(
                 songDto.getName(),
                 songFile,
                 genreRepository.findById(songDto.getGenre()).orElseThrow(() -> new CustomException("Genre not found", HttpStatus.NOT_FOUND)),
-                (long) 23.4,
-                playlistRepository.findById(songDto.getPlaylistId()).orElseThrow(
-                        () -> new CustomException("Not found", HttpStatus.NOT_FOUND)
-                )
+                (long) 23.4
         );
+        song.addPlaylist(user.getPlaylists().get(0));
 
         songRepository.save(song);
     }

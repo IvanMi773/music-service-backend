@@ -1,6 +1,7 @@
 package com.network.social_network.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "songs")
@@ -10,9 +11,13 @@ public class Song {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "playlist_id", nullable = false)
-    private Playlist playlist;
+    @ManyToMany(cascade = { CascadeType.ALL })
+    @JoinTable(
+            name = "playlist_song",
+            joinColumns = { @JoinColumn(name = "song_id") },
+            inverseJoinColumns = { @JoinColumn(name = "playlist_id") }
+    )
+    private List<Playlist> playlists;
 
     @OneToMany(mappedBy = "song")
     private List<Comment> comments;
@@ -32,13 +37,13 @@ public class Song {
             String name,
             SongFile file,
             Genre genre,
-            Long likes,
-            Playlist playlist
+            Long likes
     ) {
         this.name = name;
         this.file = file;
         this.likes = likes;
-        this.playlist = playlist;
+        playlists = new ArrayList<>();
+
         if (genre != null) {
             this.genre = genre;
         } else {
@@ -82,5 +87,17 @@ public class Song {
 
     public void setLikes (Long likes) {
         this.likes = likes;
+    }
+
+    public List<Playlist> getPlaylists () {
+        return playlists;
+    }
+
+    public void setPlaylists (List<Playlist> playlists) {
+        this.playlists = playlists;
+    }
+
+    public void addPlaylist (Playlist playlist) {
+        this.playlists.add(playlist);
     }
 }

@@ -2,11 +2,9 @@ package com.network.social_network.service;
 
 import com.network.social_network.dto.user.UserDto;
 import com.network.social_network.exception.CustomException;
-import com.network.social_network.model.User;
-import com.network.social_network.model.VerificationMail;
-import com.network.social_network.model.VerificationToken;
+import com.network.social_network.model.*;
+import com.network.social_network.repository.PlaylistRepository;
 import com.network.social_network.repository.UserRepository;
-import com.network.social_network.model.UserRole;
 import com.network.social_network.repository.VerificationTokenRepository;
 import com.network.social_network.security.jwt.JwtTokenProvider;
 import com.network.social_network.service.mail.MailService;
@@ -27,14 +25,16 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PlaylistRepository playlistRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final VerificationTokenRepository verificationTokenRepository;
     private final MailService mailService;
 
-    public UserService (UserRepository userRepository, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, VerificationTokenRepository verificationTokenRepository, MailService mailService) {
+    public UserService (UserRepository userRepository, PlaylistRepository playlistRepository, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, VerificationTokenRepository verificationTokenRepository, MailService mailService) {
         this.userRepository = userRepository;
+        this.playlistRepository = playlistRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -68,8 +68,10 @@ public class UserService {
                     false,
                     false
             );
-
             userRepository.save(user);
+
+            var playlist = new Playlist(user, "Uploads", 0.0, "asdf.png", PlayListState.PRIVATE);
+            playlistRepository.save(playlist);
 
             String token = generateVerificationToken(user);
             mailService.sendMail(new VerificationMail(
