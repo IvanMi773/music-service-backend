@@ -1,15 +1,15 @@
-package com.network.social_network.dto;
+package com.network.social_network.dto.song;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class SongDto {
+public class SongRequestDto {
 
     private String username;
     private String name;
     private MultipartFile file;
     private Long genreId;
 
-    public SongDto (String username, String name, MultipartFile file, Long genreId) {
+    public SongRequestDto (String username, String name, MultipartFile file, Long genreId) {
         this.username = username;
         this.name = name;
         this.file = file;

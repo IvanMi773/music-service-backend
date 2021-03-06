@@ -11,7 +11,7 @@ import java.io.IOException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler  {
-
+    //Todo: correct exception handling
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<Object> handleCustomException(CustomException ex) {
         return new ResponseEntity<>(ex.getMessage(), ex.getHttpStatus());

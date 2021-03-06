@@ -1,12 +1,20 @@
 package com.network.social_network.controller;
 
-import com.network.social_network.dto.SongDto;
+import com.network.social_network.dto.song.SongRequestDto;
+import com.network.social_network.dto.song.SongResponseDto;
 import com.network.social_network.model.Song;
 import com.network.social_network.service.SongService;
-import org.springframework.http.HttpStatus;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,13 +29,33 @@ public class SongController {
     }
 
     @GetMapping
-    public List<Song> getAllSongs () {
+    public ArrayList<SongResponseDto> getAllSongs () {
         return songService.getAll();
     }
 
-    @GetMapping("/{songId}")
-    public Song getSongById (@PathVariable Long songId) {
-        return songService.getSongById(songId);
+    @GetMapping("/user/{username}")
+    public List<Song> getAllSongsByUsername (@PathVariable String username) {
+        return songService.getSongsByUsername(username);
+    }
+
+    @RequestMapping(
+            value = "/{songName}",
+            method = RequestMethod.GET,
+            produces = {
+                MediaType.APPLICATION_OCTET_STREAM_VALUE
+            }
+    )
+    public ResponseEntity getSongByName(HttpServletRequest request, HttpServletResponse response, @PathVariable String songName) throws FileNotFoundException {
+
+        String file = "uploads/" + songName;
+
+        long length = new File(file).length();
+
+        InputStreamResource inputStreamResource = new InputStreamResource( new FileInputStream(file));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentLength(length);
+        httpHeaders.setCacheControl(CacheControl.noCache().getHeaderValue());
+        return new ResponseEntity(inputStreamResource, httpHeaders, HttpStatus.OK);
     }
 
     @PostMapping
@@ -37,7 +65,7 @@ public class SongController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("genre") Long genreId
     ) {
-        var songDto = new SongDto(username, name, file, genreId);
+        var songDto = new SongRequestDto(username, name, file, genreId);
         songService.createSong(songDto);
 
         HashMap<String, String> response = new HashMap<>();
@@ -47,8 +75,8 @@ public class SongController {
     }
 
     @PostMapping("/{songId}")
-    public HttpStatus updateSong (@PathVariable Long songId, @RequestBody SongDto songDto) {
-        songService.updatePost(songId, songDto);
+    public HttpStatus updateSong (@PathVariable Long songId, @RequestBody SongRequestDto songRequestDto) {
+        songService.updatePost(songId, songRequestDto);
 
         return HttpStatus.OK;
     }

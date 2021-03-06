@@ -1,16 +1,20 @@
 package com.network.social_network.service;
 
-import com.network.social_network.dto.SongDto;
+import com.network.social_network.dto.song.SongRequestDto;
+import com.network.social_network.dto.song.SongResponseDto;
 import com.network.social_network.exception.CustomException;
-import com.network.social_network.model.Playlist;
 import com.network.social_network.model.Song;
 import com.network.social_network.model.SongFile;
+import com.network.social_network.model.User;
 import com.network.social_network.repository.*;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,6 +30,7 @@ public class SongService {
     private final PlaylistRepository playlistRepository;
     private final FilesRepository filesRepository;
     private final GenreRepository genreRepository;
+    private final Path root = Paths.get("uploads");
 
     public SongService (SongRepository songRepository, UserRepository userRepository, PlaylistRepository playlistRepository, FilesRepository filesRepository, GenreRepository genreRepository) {
         this.songRepository = songRepository;
@@ -35,28 +40,65 @@ public class SongService {
         this.genreRepository = genreRepository;
     }
 
-    public List<Song> getAll () {
-        return songRepository.findAll();
+    public ArrayList<SongResponseDto> getAll () {
+        //Todo: optimise request [just get user playlists]
+        //Todo: reorder list from newest to oldest
+        var users = userRepository.findAll();
+        var songs = new ArrayList<SongResponseDto>();
+
+        for (User user : users) {
+            if (user.getPlaylists().size() <= 0) {
+                continue;
+            }
+
+            var uploadPlaylist = user.getPlaylists().get(0);
+
+            for (Song song : uploadPlaylist.getSongs()) {
+                var songDto = new SongResponseDto(
+                        user.getUsername(),
+                        song.getName(),
+                        song.getGenre().getName(),
+                        song.getLikes(),
+                        song.getSongFile().getFileName() + ".mpeg"
+                );
+                songs.add(songDto);
+            }
+        }
+
+        return songs;
     }
 
-    public Song getSongById (Long songId) {
-        //Todo: correct exception handling
-        return songRepository.findById(songId).orElseThrow(
-                () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
-        );
+    public List<Song> getSongsByUsername (String username) {
+        var user = userRepository.findByUsername(username);
+        var uploadPlaylist = user.getPlaylists().get(0);
+        return uploadPlaylist.getSongs();
     }
 
-    public void createSong (SongDto songDto) {
+    public Resource getSongByName (String songName) {
+        try {
+            Path file = root.resolve(songName);
+            Resource resource = new UrlResource(file.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("Could not read the file!");
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
+
+    public void createSong (SongRequestDto songRequestDto) {
         //Todo: calculate duration of song;
 
-        var songFile = saveSong(songDto.getSong());
-
-        var user = userRepository.findByUsername(songDto.getUsername());
+        var songFile = saveSong(songRequestDto.getSong());
+        var user = userRepository.findByUsername(songRequestDto.getUsername());
 
         var song = new Song(
-                songDto.getName(),
+                songRequestDto.getName(),
                 songFile,
-                genreRepository.findById(songDto.getGenre()).orElseThrow(() -> new CustomException("Genre not found", HttpStatus.NOT_FOUND)),
+                genreRepository.findById(songRequestDto.getGenre()).orElseThrow(() -> new CustomException("Genre not found", HttpStatus.NOT_FOUND)),
                 (long) 23.4
         );
         song.addPlaylist(user.getPlaylists().get(0));
@@ -65,8 +107,6 @@ public class SongService {
     }
 
     public SongFile saveSong (MultipartFile file) {
-        Path root = Paths.get("uploads");
-
         try {
             if (!Files.exists(root)) {
                 Files.createDirectory(root);
@@ -96,7 +136,7 @@ public class SongService {
         }
     }
 
-    public void updatePost (Long songId, SongDto songDto) {
+    public void updatePost (Long songId, SongRequestDto songRequestDto) {
         //Todo: correct update
         var song = songRepository.findById(songId).orElseThrow(
                 () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
