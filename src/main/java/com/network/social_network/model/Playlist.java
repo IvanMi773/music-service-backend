@@ -23,20 +23,23 @@ public class Playlist {
     @ManyToMany(mappedBy = "playlists")
     private List<Song> songs;
 
-    private String photo;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "photo_file_id", referencedColumnName = "fileId")
+    private PhotoFile photoFile;
+
     private PlayListState state;
 
     public Playlist (
             User user,
             String name,
             Double duration,
-            String photo,
+            PhotoFile photoFile,
             PlayListState state
     ) {
         this.user = user;
         this.name = name;
         this.duration = duration;
-        this.photo = photo;
+        this.photoFile = photoFile;
         this.state = state;
     }
 
@@ -78,12 +81,12 @@ public class Playlist {
         this.songs = songs;
     }
 
-    public String getPhoto () {
-        return photo;
+    public PhotoFile getPhoto () {
+        return photoFile;
     }
 
-    public void setPhoto (String photo) {
-        this.photo = photo;
+    public void setPhoto (PhotoFile photoFile) {
+        this.photoFile = photoFile;
     }
 
     public PlayListState getState () {

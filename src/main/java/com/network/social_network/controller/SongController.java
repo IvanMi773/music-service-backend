@@ -2,7 +2,6 @@ package com.network.social_network.controller;
 
 import com.network.social_network.dto.song.SongRequestDto;
 import com.network.social_network.dto.song.SongResponseDto;
-import com.network.social_network.model.Song;
 import com.network.social_network.service.SongService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
@@ -16,7 +15,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/song")
@@ -34,7 +32,7 @@ public class SongController {
     }
 
     @GetMapping("/user/{username}")
-    public List<Song> getAllSongsByUsername (@PathVariable String username) {
+    public ArrayList<SongResponseDto> getAllSongsByUsername (@PathVariable String username) {
         return songService.getSongsByUsername(username);
     }
 
@@ -47,7 +45,7 @@ public class SongController {
     )
     public ResponseEntity getSongByName(HttpServletRequest request, HttpServletResponse response, @PathVariable String songName) throws FileNotFoundException {
 
-        String file = "uploads/" + songName;
+        String file = "uploads/songs/" + songName;
 
         long length = new File(file).length();
 

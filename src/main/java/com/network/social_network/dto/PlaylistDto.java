@@ -1,25 +1,27 @@
 package com.network.social_network.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class PlaylistDto {
 
-    private Long userId;
+    private String username;
     private String name;
-    private String photo;
+    private MultipartFile photo;
     private Integer state;
 
-    public PlaylistDto (Long userId, String name, String photo, Integer state) {
-        this.userId = userId;
+    public PlaylistDto (String username, String name, MultipartFile photo, Integer state) {
+        this.username = username;
         this.name = name;
         this.photo = photo;
         this.state = state;
     }
 
-    public Long getUserId () {
-        return userId;
+    public String getUsername () {
+        return username;
     }
 
-    public void setUserId (Long userId) {
-        this.userId = userId;
+    public void setUsername (String username) {
+        this.username = username;
     }
 
     public String getName () {
@@ -30,11 +32,11 @@ public class PlaylistDto {
         this.name = name;
     }
 
-    public String getPhoto () {
+    public MultipartFile getPhoto () {
         return photo;
     }
 
-    public void setPhoto (String photo) {
+    public void setPhoto (MultipartFile photo) {
         this.photo = photo;
     }
 

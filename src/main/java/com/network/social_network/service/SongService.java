@@ -19,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,7 +29,7 @@ public class SongService {
     private final PlaylistRepository playlistRepository;
     private final FilesRepository filesRepository;
     private final GenreRepository genreRepository;
-    private final Path root = Paths.get("uploads");
+    private final Path root = Paths.get("uploads/songs");
 
     public SongService (SongRepository songRepository, UserRepository userRepository, PlaylistRepository playlistRepository, FilesRepository filesRepository, GenreRepository genreRepository) {
         this.songRepository = songRepository;
@@ -68,25 +67,24 @@ public class SongService {
         return songs;
     }
 
-    public List<Song> getSongsByUsername (String username) {
+    public ArrayList<SongResponseDto> getSongsByUsername (String username) {
         var user = userRepository.findByUsername(username);
         var uploadPlaylist = user.getPlaylists().get(0);
-        return uploadPlaylist.getSongs();
-    }
+        var songs = new ArrayList<SongResponseDto>();
 
-    public Resource getSongByName (String songName) {
-        try {
-            Path file = root.resolve(songName);
-            Resource resource = new UrlResource(file.toUri());
-
-            if (resource.exists() || resource.isReadable()) {
-                return resource;
-            } else {
-                throw new RuntimeException("Could not read the file!");
-            }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
+        for (Song song: uploadPlaylist.getSongs()) {
+            songs.add(
+                new SongResponseDto(
+                    username,
+                    song.getName(),
+                    song.getGenre().getName(),
+                    song.getLikes(),
+                    song.getSongFile().getFileName() + ".mpeg"
+                )
+            );
         }
+
+        return songs;
     }
 
     public void createSong (SongRequestDto songRequestDto) {

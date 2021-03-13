@@ -70,7 +70,8 @@ public class UserService {
             );
             userRepository.save(user);
 
-            var playlist = new Playlist(user, "Uploads", 0.0, "asdf.png", PlayListState.PRIVATE);
+            //Todo: correct file name
+            var playlist = new Playlist(user, "Uploads", 0.0, new PhotoFile("asdf", ".png"), PlayListState.PRIVATE);
             playlistRepository.save(playlist);
 
             String token = generateVerificationToken(user);

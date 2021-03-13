@@ -5,7 +5,9 @@ import com.network.social_network.model.Playlist;
 import com.network.social_network.service.PlaylistService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -29,17 +31,29 @@ public class PlaylistController {
     }
 
     @PostMapping
-    public HttpStatus createPlaylist (@RequestBody PlaylistDto playlistDto) {
+    public HashMap<String, String> createPlaylist (
+            @RequestParam("username") String username,
+            @RequestParam("name") String name,
+            @RequestParam("photo") MultipartFile photo,
+            @RequestParam("state") Integer state
+    ) {
+        var playlistDto = new PlaylistDto(username, name, photo, state);
         playlistService.createPlaylist(playlistDto);
 
-        return HttpStatus.OK;
+        HashMap<String, String> response = new HashMap<>();
+        response.put("ok", String.valueOf(HttpStatus.OK));
+
+        return response;
     }
 
     @PostMapping("/{playlistId}")
-    public HttpStatus updatePlaylist (@PathVariable Long playlistId, @RequestBody PlaylistDto songDto) {
+    public HashMap<String, String> updatePlaylist (@PathVariable Long playlistId, @RequestBody PlaylistDto songDto) {
         playlistService.updatePlaylist(playlistId, songDto);
 
-        return HttpStatus.OK;
+        HashMap<String, String> response = new HashMap<>();
+        response.put("ok", String.valueOf(HttpStatus.OK));
+
+        return response;
     }
 
     @DeleteMapping("/{playlistId}")
