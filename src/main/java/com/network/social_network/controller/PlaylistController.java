@@ -1,12 +1,20 @@
 package com.network.social_network.controller;
 
-import com.network.social_network.dto.PlaylistDto;
+import com.network.social_network.dto.playlist.PlaylistDto;
+import com.network.social_network.dto.playlist.PlaylistResponseDto;
 import com.network.social_network.model.Playlist;
 import com.network.social_network.service.PlaylistService;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,7 +34,7 @@ public class PlaylistController {
     }
 
     @GetMapping("/{playlistId}")
-    public Playlist getPlaylistById (@PathVariable Long playlistId) {
+    public PlaylistResponseDto getPlaylistById (@PathVariable Long playlistId) {
         return playlistService.getPlaylistById(playlistId);
     }
 
@@ -54,6 +62,26 @@ public class PlaylistController {
         response.put("ok", String.valueOf(HttpStatus.OK));
 
         return response;
+    }
+
+    @GetMapping("/user/{username}")
+    public List<PlaylistResponseDto> getPlaylistsByUsername (@PathVariable String username) {
+        List<PlaylistResponseDto> response = playlistService.getPlaylistsByUsername(username);
+
+        return response;
+    }
+
+    @GetMapping("/photo/{title}")
+    public ResponseEntity getPlaylistPhoto (@PathVariable String title) throws FileNotFoundException {
+        String file = "uploads/playlist_photos/" + title;
+
+        long length = new File(file).length();
+
+        InputStreamResource inputStreamResource = new InputStreamResource( new FileInputStream(file));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentLength(length);
+        httpHeaders.setCacheControl(CacheControl.noCache().getHeaderValue());
+        return new ResponseEntity(inputStreamResource, httpHeaders, HttpStatus.OK);
     }
 
     @DeleteMapping("/{playlistId}")

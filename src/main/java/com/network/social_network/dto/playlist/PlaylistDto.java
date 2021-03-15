@@ -1,4 +1,4 @@
-package com.network.social_network.dto;
+package com.network.social_network.dto.playlist;
 
 import org.springframework.web.multipart.MultipartFile;
 
