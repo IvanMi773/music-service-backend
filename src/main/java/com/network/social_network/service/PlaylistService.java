@@ -34,7 +34,11 @@ public class PlaylistService {
     private final PhotoFileRepository photoFileRepository;
     private final Path root = Paths.get("uploads/playlist_photos");
 
-    public PlaylistService (PlaylistRepository playlistRepository, UserRepository userRepository, PhotoFileRepository photoFileRepository) {
+    public PlaylistService (
+            PlaylistRepository playlistRepository,
+            UserRepository userRepository,
+            PhotoFileRepository photoFileRepository
+    ) {
         this.playlistRepository = playlistRepository;
         this.userRepository = userRepository;
         this.photoFileRepository = photoFileRepository;
@@ -56,7 +60,8 @@ public class PlaylistService {
                     s.getName(),
                     s.getGenre().getName(),
                     s.getLikes(),
-                    s.getSongFile().getFileName() + ".mpeg"
+                    s.getSongFile().getFileName(),
+                    s.getSongFile().getDuration()
             );
             songs.add(songDto);
         }

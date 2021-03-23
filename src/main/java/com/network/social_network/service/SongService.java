@@ -7,10 +7,13 @@ import com.network.social_network.model.Song;
 import com.network.social_network.model.SongFile;
 import com.network.social_network.model.User;
 import com.network.social_network.repository.*;
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,15 +26,18 @@ public class SongService {
 
     private final SongRepository songRepository;
     private final UserRepository userRepository;
-    private final PlaylistRepository playlistRepository;
     private final FilesRepository filesRepository;
     private final GenreRepository genreRepository;
     private final Path root = Paths.get("uploads/songs");
 
-    public SongService (SongRepository songRepository, UserRepository userRepository, PlaylistRepository playlistRepository, FilesRepository filesRepository, GenreRepository genreRepository) {
+    public SongService (
+            SongRepository songRepository,
+            UserRepository userRepository,
+            FilesRepository filesRepository,
+            GenreRepository genreRepository
+    ) {
         this.songRepository = songRepository;
         this.userRepository = userRepository;
-        this.playlistRepository = playlistRepository;
         this.filesRepository = filesRepository;
         this.genreRepository = genreRepository;
     }
@@ -55,7 +61,8 @@ public class SongService {
                         song.getName(),
                         song.getGenre().getName(),
                         song.getLikes(),
-                        song.getSongFile().getFileName() + ".mpeg"
+                        song.getSongFile().getFileName(),
+                        song.getSongFile().getDuration()
                 );
                 songs.add(songDto);
             }
@@ -69,15 +76,16 @@ public class SongService {
         var uploadPlaylist = user.getPlaylists().get(0);
         var songs = new ArrayList<SongResponseDto>();
 
-        for (Song song: uploadPlaylist.getSongs()) {
+        for (Song song : uploadPlaylist.getSongs()) {
             songs.add(
-                new SongResponseDto(
-                    username,
-                    song.getName(),
-                    song.getGenre().getName(),
-                    song.getLikes(),
-                    song.getSongFile().getFileName() + ".mpeg"
-                )
+                    new SongResponseDto(
+                            username,
+                            song.getName(),
+                            song.getGenre().getName(),
+                            song.getLikes(),
+                            song.getSongFile().getFileName(),
+                            song.getSongFile().getDuration()
+                    )
             );
         }
 
@@ -85,8 +93,6 @@ public class SongService {
     }
 
     public void createSong (SongRequestDto songRequestDto) {
-        //Todo: calculate duration of song;
-
         var songFile = saveSong(songRequestDto.getSong());
         var user = userRepository.findByUsername(songRequestDto.getUsername());
 
@@ -111,23 +117,23 @@ public class SongService {
         }
 
         try {
-            String filename = String.valueOf(UUID.randomUUID());
-            String path = root + "/" + filename + "." + file.getContentType().split("/")[1];
+            String filename = UUID.randomUUID() + ".mp3";
+            String path = root + "/" + filename;
             Files.write(Paths.get(path), file.getBytes());
 
-//            path = path.replace("/", "\\");
-//            File target = new File("D:\\Projects\\music_service\\social_network\\" + path);
-//            AudioFile af = AudioFileIO.read(target);
-//            AudioHeader ah = af.getAudioHeader();
-//            System.out.println( ah.getTrackLength());
+            File target = new File("D:\\Projects\\music_service\\social_network\\" + path);
+            int duration;
 
-            SongFile model = new SongFile(filename, file.getContentType());
+            AudioFile audioFile = AudioFileIO.read(target);
+            duration = audioFile.getAudioHeader().getTrackLength();
+
+            SongFile model = new SongFile(filename, duration);
             filesRepository.save(model);
 
             return model;
         } catch (Exception e) {
             //Todo: change exception
-            throw new CustomException("io err", HttpStatus.MULTI_STATUS);
+            throw new CustomException("Saving song error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

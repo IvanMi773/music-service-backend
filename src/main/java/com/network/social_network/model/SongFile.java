@@ -13,15 +13,14 @@ public class SongFile {
     private Song song;
 
     private String fileName;
-    private String fileType;
-    private Double duration;
+    private Integer duration;
 
     public SongFile () {
     }
 
-    public SongFile (String fileName, String fileType) {
+    public SongFile (String fileName, Integer duration) {
         this.fileName = fileName;
-        this.fileType = fileType;
+        this.duration = duration;
     }
 
     public Long getFileId () {
@@ -36,19 +35,11 @@ public class SongFile {
         this.fileName = fileName;
     }
 
-    public String getFileType () {
-        return fileType;
-    }
-
-    public void setFileType (String fileType) {
-        this.fileType = fileType;
-    }
-
-    public Double getDuration () {
+    public Integer getDuration () {
         return duration;
     }
 
-    public void setDuration (Double duration) {
+    public void setDuration (Integer duration) {
         this.duration = duration;
     }
 }

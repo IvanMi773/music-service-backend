@@ -12,19 +12,19 @@ import java.io.IOException;
 @RestControllerAdvice
 public class GlobalExceptionHandler  {
     //Todo: correct exception handling
-    @ExceptionHandler(CustomException.class)
-    public ResponseEntity<Object> handleCustomException(CustomException ex) {
-        return new ResponseEntity<>(ex.getMessage(), ex.getHttpStatus());
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public void handleAccessDeniedException(HttpServletResponse res) throws IOException {
-        res.sendError(HttpStatus.FORBIDDEN.value(), "Access denied");
-    }
-
-    @ExceptionHandler(Exception.class)
-    public void handleException(HttpServletResponse res) throws IOException {
-        res.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Something went wrong");
-    }
+//    @ExceptionHandler(CustomException.class)
+//    public ResponseEntity<Object> handleCustomException(CustomException ex) {
+//        return new ResponseEntity<>(ex.getMessage(), ex.getHttpStatus());
+//    }
+//
+//    @ExceptionHandler(AccessDeniedException.class)
+//    public void handleAccessDeniedException(HttpServletResponse res) throws IOException {
+//        res.sendError(HttpStatus.FORBIDDEN.value(), "Access denied");
+//    }
+//
+//    @ExceptionHandler(Exception.class)
+//    public void handleException(HttpServletResponse res) throws IOException {
+//        res.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Something went wrong");
+//    }
 
 }

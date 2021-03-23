@@ -7,13 +7,22 @@ public class SongResponseDto {
     private String genre;
     private Long likes;
     private String file;
+    private Integer duration;
 
-    public SongResponseDto (String username, String name, String genre, Long likes, String file) {
+    public SongResponseDto (
+            String username,
+            String name,
+            String genre,
+            Long likes,
+            String file,
+            Integer duration
+    ) {
         this.username = username;
         this.name = name;
         this.genre = genre;
         this.likes = likes;
         this.file = file;
+        this.duration = duration;
     }
 
     public SongResponseDto () {
@@ -57,5 +66,13 @@ public class SongResponseDto {
 
     public void setFile (String file) {
         this.file = file;
+    }
+
+    public Integer getDuration () {
+        return duration;
+    }
+
+    public void setDuration (Integer duration) {
+        this.duration = duration;
     }
 }
