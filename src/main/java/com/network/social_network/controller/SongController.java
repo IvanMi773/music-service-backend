@@ -1,5 +1,6 @@
 package com.network.social_network.controller;
 
+import com.network.social_network.dto.song.SongLikesDto;
 import com.network.social_network.dto.song.SongRequestDto;
 import com.network.social_network.dto.song.SongResponseDto;
 import com.network.social_network.service.SongService;
@@ -74,9 +75,19 @@ public class SongController {
 
     @PostMapping("/{songId}")
     public HttpStatus updateSong (@PathVariable Long songId, @RequestBody SongRequestDto songRequestDto) {
-        songService.updatePost(songId, songRequestDto);
+        songService.updateSong(songId, songRequestDto);
 
         return HttpStatus.OK;
+    }
+
+    @GetMapping("/likes/{songId}/{username}")
+    public SongLikesDto getLikesOfSong (@PathVariable Long songId, @PathVariable String username) {
+        return songService.getLikesOfSong(songId, username);
+    }
+
+    @PutMapping("/updateLikes/{songId}")
+    public SongLikesDto updateLikesOfSong (@PathVariable Long songId, @RequestBody String username) {
+        return songService.updateLikesOfSong(songId, username);
     }
 
     @DeleteMapping("/{songId}")

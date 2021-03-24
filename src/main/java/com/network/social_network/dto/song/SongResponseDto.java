@@ -2,30 +2,34 @@ package com.network.social_network.dto.song;
 
 public class SongResponseDto {
 
+    private Long id;
     private String username;
     private String name;
     private String genre;
-    private Long likes;
     private String file;
     private Integer duration;
 
     public SongResponseDto (
+            Long id,
             String username,
             String name,
             String genre,
-            Long likes,
             String file,
             Integer duration
     ) {
+        this.id = id;
         this.username = username;
         this.name = name;
         this.genre = genre;
-        this.likes = likes;
         this.file = file;
         this.duration = duration;
     }
 
     public SongResponseDto () {
+    }
+
+    public Long getId () {
+        return id;
     }
 
     public String getUsername () {
@@ -50,14 +54,6 @@ public class SongResponseDto {
 
     public void setGenre (String genre) {
         this.genre = genre;
-    }
-
-    public Long getLikes () {
-        return likes;
-    }
-
-    public void setLikes (Long likes) {
-        this.likes = likes;
     }
 
     public String getFile () {

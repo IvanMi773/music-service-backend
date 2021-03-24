@@ -1,5 +1,6 @@
 package com.network.social_network.service;
 
+import com.network.social_network.dto.song.SongLikesDto;
 import com.network.social_network.dto.song.SongRequestDto;
 import com.network.social_network.dto.song.SongResponseDto;
 import com.network.social_network.exception.CustomException;
@@ -57,10 +58,10 @@ public class SongService {
 
             for (Song song : uploadPlaylist.getSongs()) {
                 var songDto = new SongResponseDto(
+                        song.getId(),
                         user.getUsername(),
                         song.getName(),
                         song.getGenre().getName(),
-                        song.getLikes(),
                         song.getSongFile().getFileName(),
                         song.getSongFile().getDuration()
                 );
@@ -79,10 +80,10 @@ public class SongService {
         for (Song song : uploadPlaylist.getSongs()) {
             songs.add(
                     new SongResponseDto(
+                            song.getId(),
                             username,
                             song.getName(),
                             song.getGenre().getName(),
-                            song.getLikes(),
                             song.getSongFile().getFileName(),
                             song.getSongFile().getDuration()
                     )
@@ -99,8 +100,7 @@ public class SongService {
         var song = new Song(
                 songRequestDto.getName(),
                 songFile,
-                genreRepository.findById(songRequestDto.getGenre()).orElseThrow(() -> new CustomException("Genre not found", HttpStatus.NOT_FOUND)),
-                (long) 23.4
+                genreRepository.findById(songRequestDto.getGenre()).orElseThrow(() -> new CustomException("Genre not found", HttpStatus.NOT_FOUND))
         );
         song.addPlaylist(user.getPlaylists().get(0));
 
@@ -137,7 +137,7 @@ public class SongService {
         }
     }
 
-    public void updatePost (Long songId, SongRequestDto songRequestDto) {
+    public void updateSong (Long songId, SongRequestDto songRequestDto) {
         //Todo: correct update
         var song = songRepository.findById(songId).orElseThrow(
                 () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
@@ -153,5 +153,31 @@ public class SongService {
 
     public void deleteSongById (Long songId) {
         songRepository.deleteById(songId);
+    }
+
+    public SongLikesDto updateLikesOfSong (Long songId, String username) {
+        var song = songRepository.findById(songId).orElseThrow(
+                () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
+        );
+
+        var user = userRepository.findByUsername(username);
+        if (song.getLikes().contains(user)) {
+            song.getLikes().remove(user);
+        } else {
+            song.getLikes().add(user);
+        }
+        songRepository.save(song);
+
+        return new SongLikesDto(song.getId(), song.getLikes().stream().count(), song.getLikes().contains(user));
+    }
+
+    public SongLikesDto getLikesOfSong (Long songId, String username) {
+        var song = songRepository.findById(songId).orElseThrow(
+                () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
+        );
+
+        var user = userRepository.findByUsername(username);
+
+        return new SongLikesDto(song.getId(), song.getLikes().stream().count(), song.getLikes().contains(user));
     }
 }

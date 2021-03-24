@@ -9,23 +9,18 @@ public class PlaylistResponseDto {
     private Long id;
     private String title;
     private String photo;
-    private Double duration;
     private List<SongResponseDto> songs;
 
-    public PlaylistResponseDto (Long id, String title, String photo, Double duration, List<SongResponseDto> songs) {
+    public PlaylistResponseDto (
+            Long id,
+            String title,
+            String photo,
+            List<SongResponseDto> songs
+    ) {
         this.id = id;
         this.title = title;
         this.photo = photo;
-        this.duration = duration;
         this.songs = songs;
-    }
-
-    public Double getDuration () {
-        return duration;
-    }
-
-    public void setDuration (Double duration) {
-        this.duration = duration;
     }
 
     public List<SongResponseDto> getSongs () {

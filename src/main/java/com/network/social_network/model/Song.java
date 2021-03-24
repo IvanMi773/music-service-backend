@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "songs")
 public class Song {
@@ -34,17 +36,21 @@ public class Song {
     @ManyToOne
     private Genre genre;
 
-    private Long likes;
+    @ManyToMany
+    @JoinTable(
+            name = "song_likes",
+            joinColumns = { @JoinColumn(name = "id") },
+            inverseJoinColumns = { @JoinColumn(name = "user_id") }
+    )
+    private Set<User> likes = new HashSet<>();
 
     public Song (
             String name,
             SongFile file,
-            Genre genre,
-            Long likes
+            Genre genre
     ) {
         this.name = name;
         this.file = file;
-        this.likes = likes;
         playlists = new ArrayList<>();
 
         if (genre != null) {
@@ -84,11 +90,11 @@ public class Song {
         this.genre = genre;
     }
 
-    public Long getLikes () {
+    public Set<User> getLikes () {
         return likes;
     }
 
-    public void setLikes (Long likes) {
+    public void setLikes (Set<User> likes) {
         this.likes = likes;
     }
 

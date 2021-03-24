@@ -18,7 +18,6 @@ public class Playlist {
     private User user;
 
     private String name;
-    private Double duration;
 
     @ManyToMany(mappedBy = "playlists")
     private List<Song> songs;
@@ -32,13 +31,11 @@ public class Playlist {
     public Playlist (
             User user,
             String name,
-            Double duration,
             PhotoFile photoFile,
             PlayListState state
     ) {
         this.user = user;
         this.name = name;
-        this.duration = duration;
         this.photoFile = photoFile;
         this.state = state;
     }
@@ -63,14 +60,6 @@ public class Playlist {
 
     public void setName (String name) {
         this.name = name;
-    }
-
-    public Double getDuration () {
-        return duration;
-    }
-
-    public void setDuration (Double duration) {
-        this.duration = duration;
     }
 
     public List<Song> getSongs () {

@@ -56,10 +56,10 @@ public class PlaylistService {
         var songs = new ArrayList<SongResponseDto>();
         for (Song s: playlist.getSongs()) {
             var songDto = new SongResponseDto(
+                    s.getId(),
                     playlist.getUser().getUsername(),
                     s.getName(),
                     s.getGenre().getName(),
-                    s.getLikes(),
                     s.getSongFile().getFileName(),
                     s.getSongFile().getDuration()
             );
@@ -70,7 +70,6 @@ public class PlaylistService {
                 playlist.getId(),
                 playlist.getName(),
                 playlist.getPhoto().getFileName(),
-                playlist.getDuration(),
                 songs
         );
 
@@ -89,7 +88,6 @@ public class PlaylistService {
         var playlist = new Playlist(
                 userRepository.findByUsername(playlistDto.getUsername()),
                 playlistDto.getName(),
-                0.0,
                 photoFile,
                 playlistDto.getState() == 0 ? PlayListState.PRIVATE : PlayListState.PUBLIC
         );
@@ -160,7 +158,6 @@ public class PlaylistService {
                             p.getId(),
                             p.getName(),
                             p.getPhoto().getFileName(),
-                            p.getDuration(),
                             null
                     )
             );
