@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "users")
 public class User {
@@ -38,6 +39,22 @@ public class User {
 
     @NotBlank(message = "Last name is required")
     private String lastName;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_subscriptions",
+            joinColumns = @JoinColumn(name = "subscriber_id"),
+            inverseJoinColumns = @JoinColumn(name = "channel_id")
+    )
+    private Set<User> subscriptions;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_subscriptions",
+            joinColumns = @JoinColumn(name = "channel_id"),
+            inverseJoinColumns = @JoinColumn(name = "subscriber_id")
+    )
+    private Set<User> subscribers;
 
     private Instant created_at;
     private Instant enabled_at;
@@ -192,5 +209,21 @@ public class User {
 
     public void setEnabled (boolean enabled) {
         isEnabled = enabled;
+    }
+
+    public Set<User> getSubscriptions () {
+        return subscriptions;
+    }
+
+    public void setSubscriptions (Set<User> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
+
+    public Set<User> getSubscribers () {
+        return subscribers;
+    }
+
+    public void setSubscribers (Set<User> subscribers) {
+        this.subscribers = subscribers;
     }
 }

@@ -1,6 +1,7 @@
 package com.network.social_network.service;
 
 import com.network.social_network.dto.user.UserDto;
+import com.network.social_network.dto.user.UserProfileDto;
 import com.network.social_network.exception.CustomException;
 import com.network.social_network.model.*;
 import com.network.social_network.repository.PlaylistRepository;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -56,7 +58,6 @@ public class UserService {
     public String register (UserDto userDto) {
         if (!userRepository.existsByUsername(userDto.getUsername()) && !userRepository.existsByEmail(userDto.getEmail())) {
             var user = new User(
-                    //Todo: rewrite code
                     userDto.getEmail(),
                     userDto.getUsername(),
                     passwordEncoder.encode(userDto.getPassword()),
@@ -71,8 +72,10 @@ public class UserService {
             userRepository.save(user);
 
             //Todo: correct file name
-            var playlist = new Playlist(user, "Uploads", new PhotoFile("default.png", ".png"), PlayListState.PRIVATE);
-            playlistRepository.save(playlist);
+            var uploadsPlaylist = new Playlist(user, "Uploads", new PhotoFile("default.png", ".png"), PlayListState.PRIVATE);
+            var likedPlaylist = new Playlist(user, "Liked", new PhotoFile("liked.png", ".png"), PlayListState.PRIVATE);
+            playlistRepository.save(uploadsPlaylist);
+            playlistRepository.save(likedPlaylist);
 
             String token = generateVerificationToken(user);
             mailService.sendMail(new VerificationMail(
@@ -112,5 +115,45 @@ public class UserService {
         userRepository.save(user);
 
         verificationTokenRepository.deleteById(verificationToken.getId());
+    }
+
+    public UserProfileDto changeSubscription (User channel, User subscriber) {
+
+        Set<User> subscribers = channel.getSubscribers();
+
+        if (subscribers.contains(subscriber)) {
+            subscribers.remove(subscriber);
+        } else {
+            subscribers.add(subscriber);
+        }
+
+        userRepository.save(channel);
+
+        var userProfileDto = new UserProfileDto(
+                channel.getId(),
+                channel.getUsername(),
+                channel.getFirstName(),
+                channel.getLastName(),
+                channel.getSubscriptions().size(),
+                channel.getSubscribers().size(),
+                channel.getPlaylists().get(0).getSongs().size()
+        );
+
+        return userProfileDto;
+    }
+
+    public UserProfileDto getUserProfileDtoByUsername (String username) {
+        var user = userRepository.findByUsername(username);
+        var userProfileDto = new UserProfileDto(
+                user.getId(),
+                user.getUsername(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getSubscriptions().size(),
+                user.getSubscribers().size(),
+                user.getPlaylists().get(0).getSongs().size()
+        );
+
+        return userProfileDto;
     }
 }

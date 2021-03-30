@@ -6,6 +6,7 @@ import com.network.social_network.dto.song.SongResponseDto;
 import com.network.social_network.service.SongService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/song")
@@ -55,6 +57,11 @@ public class SongController {
         httpHeaders.setContentLength(length);
         httpHeaders.setCacheControl(CacheControl.noCache().getHeaderValue());
         return new ResponseEntity(inputStreamResource, httpHeaders, HttpStatus.OK);
+    }
+
+    @GetMapping("/s")
+    public List<SongResponseDto> getSubscribersSongs (@AuthenticationPrincipal org.springframework.security.core.userdetails.User userdetails) {
+        return songService.getSubscriptionsSongs(userdetails.getUsername());
     }
 
     @PostMapping

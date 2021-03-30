@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -29,18 +30,21 @@ public class SongService {
     private final UserRepository userRepository;
     private final FilesRepository filesRepository;
     private final GenreRepository genreRepository;
+    private final PlaylistRepository playlistRepository;
     private final Path root = Paths.get("uploads/songs");
+    private final String fileExpansion = ".mp3";
 
     public SongService (
             SongRepository songRepository,
             UserRepository userRepository,
             FilesRepository filesRepository,
-            GenreRepository genreRepository
-    ) {
+            GenreRepository genreRepository,
+            PlaylistRepository playlistRepository) {
         this.songRepository = songRepository;
         this.userRepository = userRepository;
         this.filesRepository = filesRepository;
         this.genreRepository = genreRepository;
+        this.playlistRepository = playlistRepository;
     }
 
     public ArrayList<SongResponseDto> getAll () {
@@ -117,7 +121,7 @@ public class SongService {
         }
 
         try {
-            String filename = UUID.randomUUID() + ".mp3";
+            String filename = UUID.randomUUID() + fileExpansion;
             String path = root + "/" + filename;
             Files.write(Paths.get(path), file.getBytes());
 
@@ -161,11 +165,15 @@ public class SongService {
         );
 
         var user = userRepository.findByUsername(username);
+
         if (song.getLikes().contains(user)) {
             song.getLikes().remove(user);
+            song.removeFromPlaylist(user.getPlaylists().get(1));
         } else {
             song.getLikes().add(user);
+            song.addPlaylist(user.getPlaylists().get(1));
         }
+
         songRepository.save(song);
 
         return new SongLikesDto(song.getId(), song.getLikes().stream().count(), song.getLikes().contains(user));
@@ -179,5 +187,26 @@ public class SongService {
         var user = userRepository.findByUsername(username);
 
         return new SongLikesDto(song.getId(), song.getLikes().stream().count(), song.getLikes().contains(user));
+    }
+
+    public List<SongResponseDto> getSubscriptionsSongs (String username) {
+
+        var user = userRepository.findByUsername(username);
+        var songs = new ArrayList<SongResponseDto>();
+
+        for (User u : user.getSubscriptions()) {
+            for (Song s : u.getPlaylists().get(0).getSongs()) {
+                songs.add(new SongResponseDto(
+                        s.getId(),
+                        u.getUsername(),
+                        s.getName(),
+                        s.getGenre().getName(),
+                        s.getSongFile().getFileName(),
+                        s.getSongFile().getDuration()
+                ));
+            }
+        }
+
+        return songs;
     }
 }
