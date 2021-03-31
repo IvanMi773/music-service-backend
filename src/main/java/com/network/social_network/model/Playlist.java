@@ -19,7 +19,7 @@ public class Playlist {
 
     private String name;
 
-    @ManyToMany(mappedBy = "playlists")
+    @ManyToMany(mappedBy = "playlists", cascade = CascadeType.ALL)
     private List<Song> songs;
 
     @OneToOne(cascade = CascadeType.ALL)

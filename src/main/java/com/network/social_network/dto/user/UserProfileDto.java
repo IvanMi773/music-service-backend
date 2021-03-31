@@ -9,6 +9,7 @@ public class UserProfileDto {
     private Integer subscriptions;
     private Integer subscribers;
     private Integer tracks;
+    private String email;
 
     public UserProfileDto (
             Long id,
@@ -17,7 +18,8 @@ public class UserProfileDto {
             String lastName,
             Integer subscriptions,
             Integer subscribers,
-            Integer tracks
+            Integer tracks,
+            String email
     ) {
         this.id = id;
         this.username = username;
@@ -26,6 +28,7 @@ public class UserProfileDto {
         this.subscriptions = subscriptions;
         this.subscribers = subscribers;
         this.tracks = tracks;
+        this.email = email;
     }
 
     public Long getId () {
@@ -82,5 +85,13 @@ public class UserProfileDto {
 
     public void setSubscribers (Integer subscribers) {
         this.subscribers = subscribers;
+    }
+
+    public String getEmail () {
+        return email;
+    }
+
+    public void setEmail (String email) {
+        this.email = email;
     }
 }

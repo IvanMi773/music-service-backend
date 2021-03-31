@@ -17,10 +17,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Playlist> playlists;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
     @Email
@@ -40,7 +40,7 @@ public class User {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_subscriptions",
             joinColumns = @JoinColumn(name = "subscriber_id"),
@@ -48,7 +48,7 @@ public class User {
     )
     private Set<User> subscriptions;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_subscriptions",
             joinColumns = @JoinColumn(name = "channel_id"),

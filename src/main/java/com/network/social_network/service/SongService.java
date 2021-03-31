@@ -209,4 +209,11 @@ public class SongService {
 
         return songs;
     }
+
+    public void saveSongToHistory (Long songId, String username) {
+        var user = userRepository.findByUsername(username);
+        var song = songRepository.findById(songId).orElseThrow(() -> new CustomException("Song not found", HttpStatus.NOT_FOUND));
+        song.addPlaylist(user.getPlaylists().get(2)); // History playlist
+        songRepository.save(song);
+    }
 }

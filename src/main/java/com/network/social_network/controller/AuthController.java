@@ -34,10 +34,10 @@ public class AuthController {
         return response;
     }
 
-    @GetMapping("/verify/{token}")
-    public HttpStatus verifyAccount(@PathVariable String token) {
-        userService.verifyAccount(token);
-
-        return HttpStatus.OK;
-    }
+//    @GetMapping("/verify/{token}")
+//    public HttpStatus verifyAccount(@PathVariable String token) {
+//        userService.verifyAccount(token);
+//
+//        return HttpStatus.OK;
+//    }
 }

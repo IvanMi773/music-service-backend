@@ -1,12 +1,14 @@
 package com.network.social_network.service;
 
 import com.network.social_network.dto.user.UserDto;
+import com.network.social_network.dto.user.UserLibraryDto;
 import com.network.social_network.dto.user.UserProfileDto;
+import com.network.social_network.dto.user.UserUpdateDto;
 import com.network.social_network.exception.CustomException;
 import com.network.social_network.model.*;
 import com.network.social_network.repository.PlaylistRepository;
 import com.network.social_network.repository.UserRepository;
-import com.network.social_network.repository.VerificationTokenRepository;
+//import com.network.social_network.repository.VerificationTokenRepository;
 import com.network.social_network.security.jwt.JwtTokenProvider;
 import com.network.social_network.service.mail.MailService;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,16 +34,23 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final VerificationTokenRepository verificationTokenRepository;
+//    private final VerificationTokenRepository verificationTokenRepository;
     private final MailService mailService;
 
-    public UserService (UserRepository userRepository, PlaylistRepository playlistRepository, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, VerificationTokenRepository verificationTokenRepository, MailService mailService) {
+    public UserService (
+            UserRepository userRepository,
+            PlaylistRepository playlistRepository,
+            JwtTokenProvider jwtTokenProvider,
+            PasswordEncoder passwordEncoder,
+            AuthenticationManager authenticationManager,
+            MailService mailService
+    ) {
         this.userRepository = userRepository;
         this.playlistRepository = playlistRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
-        this.verificationTokenRepository = verificationTokenRepository;
+//        this.verificationTokenRepository = verificationTokenRepository;
         this.mailService = mailService;
     }
 
@@ -74,15 +84,18 @@ public class UserService {
             //Todo: correct file name
             var uploadsPlaylist = new Playlist(user, "Uploads", new PhotoFile("default.png", ".png"), PlayListState.PRIVATE);
             var likedPlaylist = new Playlist(user, "Liked", new PhotoFile("liked.png", ".png"), PlayListState.PRIVATE);
+            var historyPlaylist = new Playlist(user, "History", new PhotoFile("default.png", ".png"), PlayListState.PRIVATE);
+
             playlistRepository.save(uploadsPlaylist);
             playlistRepository.save(likedPlaylist);
+            playlistRepository.save(historyPlaylist);
 
-            String token = generateVerificationToken(user);
-            mailService.sendMail(new VerificationMail(
-                    "Please activate your account",
-                    user.getEmail(),
-                    "localhost:8080/api/auth/verify/" + token
-            ));
+//            String token = generateVerificationToken(user);
+//            mailService.sendMail(new VerificationMail(
+//                    "Please activate your account",
+//                    user.getEmail(),
+//                    "localhost:8080/api/auth/verify/" + token
+//            ));
 
             return jwtTokenProvider.generateToken(user.getUsername(), user.getRole());
         } else {
@@ -90,32 +103,32 @@ public class UserService {
         }
     }
 
-    private String generateVerificationToken (User user) {
-        String token = UUID.randomUUID().toString();
+//    private String generateVerificationToken (User user) {
+//        String token = UUID.randomUUID().toString();
+//
+//        VerificationToken verificationToken = new VerificationToken(
+//                token,
+//                user,
+//                Instant.now().plusSeconds(10800) // 3 hours
+//        );
+//
+//        verificationTokenRepository.save(verificationToken);
+//
+//        return token;
+//    }
 
-        VerificationToken verificationToken = new VerificationToken(
-                token,
-                user,
-                Instant.now().plusSeconds(10800) // 3 hours
-        );
-
-        verificationTokenRepository.save(verificationToken);
-
-        return token;
-    }
-
-    public void verifyAccount (String token) {
-        //Todo: check if token expire
-        VerificationToken verificationToken = verificationTokenRepository.findByToken(token).get();
-
-        String username = verificationToken.getUser().getUsername();
-        User user = userRepository.findByUsername(username);
-        user.setIsEnabled(true);
-        user.setEnabled_at(Instant.now());
-        userRepository.save(user);
-
-        verificationTokenRepository.deleteById(verificationToken.getId());
-    }
+//    public void verifyAccount (String token) {
+//        //Todo: check if token expire
+//        VerificationToken verificationToken = verificationTokenRepository.findByToken(token).get();
+//
+//        String username = verificationToken.getUser().getUsername();
+//        User user = userRepository.findByUsername(username);
+//        user.setIsEnabled(true);
+//        user.setEnabled_at(Instant.now());
+//        userRepository.save(user);
+//
+//        verificationTokenRepository.deleteById(verificationToken.getId());
+//    }
 
     public UserProfileDto changeSubscription (User channel, User subscriber) {
 
@@ -136,7 +149,8 @@ public class UserService {
                 channel.getLastName(),
                 channel.getSubscriptions().size(),
                 channel.getSubscribers().size(),
-                channel.getPlaylists().get(0).getSongs().size()
+                channel.getPlaylists().get(0).getSongs().size(),
+                channel.getEmail()
         );
 
         return userProfileDto;
@@ -151,9 +165,59 @@ public class UserService {
                 user.getLastName(),
                 user.getSubscriptions().size(),
                 user.getSubscribers().size(),
-                user.getPlaylists().get(0).getSongs().size()
+                user.getPlaylists().get(0).getSongs().size(),
+                user.getEmail()
         );
 
         return userProfileDto;
+    }
+
+    public UserLibraryDto getUserByUsername (String username) {
+        //Todo: create enum 'playlist name' (history, liked, uploads)
+        var user = userRepository.findByUsername(username);
+        var subscribers = new HashSet<UserProfileDto>();
+        var subscriptions = new HashSet<UserProfileDto>();
+
+        for (User u : user.getSubscribers()) {
+            subscribers.add(new UserProfileDto(
+                    u.getId(),
+                    u.getUsername(),
+                    u.getFirstName(),
+                    u.getLastName(),
+                    u.getSubscriptions().size(),
+                    u.getSubscribers().size(),
+                    u.getPlaylists().get(0).getSongs().size(),
+                    u.getEmail()
+            ));
+        }
+
+        for (User u : user.getSubscriptions()) {
+            subscriptions.add(new UserProfileDto(
+                    u.getId(),
+                    u.getUsername(),
+                    u.getFirstName(),
+                    u.getLastName(),
+                    u.getSubscriptions().size(),
+                    u.getSubscribers().size(),
+                    u.getPlaylists().get(0).getSongs().size(),
+                    u.getEmail()
+            ));
+        }
+
+        return new UserLibraryDto(subscribers, subscriptions);
+    }
+
+    public void updateUser (String username, UserUpdateDto user) {
+        var userToUpdate = userRepository.findByUsername(username);
+
+        userToUpdate.setEmail(user.getEmail());
+        userToUpdate.setFirstName(user.getFirstName());
+        userToUpdate.setLastName(user.getLastName());
+
+        userRepository.save(userToUpdate);
+    }
+
+    public void delete (String username) {
+        userRepository.deleteByUsername(username);
     }
 }

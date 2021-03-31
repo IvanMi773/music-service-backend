@@ -7,6 +7,7 @@ import com.network.social_network.service.SongService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,7 +61,7 @@ public class SongController {
     }
 
     @GetMapping("/s")
-    public List<SongResponseDto> getSubscribersSongs (@AuthenticationPrincipal org.springframework.security.core.userdetails.User userdetails) {
+    public List<SongResponseDto> getSubscriptionsSongs (@AuthenticationPrincipal org.springframework.security.core.userdetails.User userdetails) {
         return songService.getSubscriptionsSongs(userdetails.getUsername());
     }
 
@@ -83,6 +84,14 @@ public class SongController {
     @PostMapping("/{songId}")
     public HttpStatus updateSong (@PathVariable Long songId, @RequestBody SongRequestDto songRequestDto) {
         songService.updateSong(songId, songRequestDto);
+
+        return HttpStatus.OK;
+    }
+
+    @PostMapping("/h/{songId}")
+    public HttpStatus saveSongToHistory (@PathVariable Long songId, @AuthenticationPrincipal User user) {
+        //TODO: remove "save to history", and replace it to "save song to playlist"
+        songService.saveSongToHistory(songId, user.getUsername());
 
         return HttpStatus.OK;
     }
