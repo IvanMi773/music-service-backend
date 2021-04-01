@@ -10,6 +10,7 @@ public class UserProfileDto {
     private Integer subscribers;
     private Integer tracks;
     private String email;
+    private String avatar;
 
     public UserProfileDto (
             Long id,
@@ -19,7 +20,8 @@ public class UserProfileDto {
             Integer subscriptions,
             Integer subscribers,
             Integer tracks,
-            String email
+            String email,
+            String avatar
     ) {
         this.id = id;
         this.username = username;
@@ -29,6 +31,7 @@ public class UserProfileDto {
         this.subscribers = subscribers;
         this.tracks = tracks;
         this.email = email;
+        this.avatar = avatar;
     }
 
     public Long getId () {
@@ -93,5 +96,13 @@ public class UserProfileDto {
 
     public void setEmail (String email) {
         this.email = email;
+    }
+
+    public String getAvatar () {
+        return avatar;
+    }
+
+    public void setAvatar (String avatar) {
+        this.avatar = avatar;
     }
 }

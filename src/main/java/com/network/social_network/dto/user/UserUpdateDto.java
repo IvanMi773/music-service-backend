@@ -1,15 +1,19 @@
 package com.network.social_network.dto.user;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class UserUpdateDto {
 
     private String email;
     private String firstName;
     private String lastName;
+    private MultipartFile avatar;
 
-    public UserUpdateDto (String email, String firstName, String lastName) {
+    public UserUpdateDto (String email, String firstName, String lastName, MultipartFile avatar) {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.avatar = avatar;
     }
 
     public String getEmail() {
@@ -36,4 +40,11 @@ public class UserUpdateDto {
         this.lastName = lastName;
     }
 
+    public MultipartFile getAvatar () {
+        return avatar;
+    }
+
+    public void setAvatar (MultipartFile avatar) {
+        this.avatar = avatar;
+    }
 }

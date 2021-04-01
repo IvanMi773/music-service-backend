@@ -31,6 +31,7 @@ public class CreateAdminUserAppStartupRunner implements CommandLineRunner {
                     passwordEncoder.encode("password"),
                     "admin",
                     "admin",
+                    "default_user.png",
                     new Date().toInstant(),
                     new Date().toInstant(),
                     UserRole.ADMIN.getRole(),

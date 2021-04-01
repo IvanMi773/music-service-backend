@@ -4,44 +4,30 @@ import com.network.social_network.dto.playlist.PlaylistDto;
 import com.network.social_network.dto.playlist.PlaylistResponseDto;
 import com.network.social_network.dto.song.SongResponseDto;
 import com.network.social_network.exception.CustomException;
-import com.network.social_network.model.PhotoFile;
 import com.network.social_network.model.PlayListState;
 import com.network.social_network.model.Playlist;
 import com.network.social_network.model.Song;
-import com.network.social_network.repository.PhotoFileRepository;
 import com.network.social_network.repository.PlaylistRepository;
 import com.network.social_network.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class PlaylistService {
 
     private final PlaylistRepository playlistRepository;
     private final UserRepository userRepository;
-    private final PhotoFileRepository photoFileRepository;
-    private final Path root = Paths.get("uploads/playlist_photos");
+    private final FileUploadService fileUploadService;
 
     public PlaylistService (
             PlaylistRepository playlistRepository,
             UserRepository userRepository,
-            PhotoFileRepository photoFileRepository
-    ) {
+            FileUploadService fileUploadService) {
         this.playlistRepository = playlistRepository;
         this.userRepository = userRepository;
-        this.photoFileRepository = photoFileRepository;
+        this.fileUploadService = fileUploadService;
     }
 
     public List<Playlist> getAll () {
@@ -69,7 +55,7 @@ public class PlaylistService {
         var playlistDto = new PlaylistResponseDto(
                 playlist.getId(),
                 playlist.getName(),
-                playlist.getPhoto().getFileName(),
+                playlist.getPhoto(),
                 songs
         );
 
@@ -82,7 +68,7 @@ public class PlaylistService {
 
     public void createPlaylist (PlaylistDto playlistDto) {
 
-        var photoFile = savePhoto(playlistDto.getPhoto());
+        var photoFile = fileUploadService.savePlaylistPhoto(playlistDto.getPhoto());
 
         //Todo: throw exception if user not found
         var playlist = new Playlist(
@@ -93,45 +79,6 @@ public class PlaylistService {
         );
 
         playlistRepository.save(playlist);
-    }
-
-    //Todo: move to a separate class
-    //Todo: create common table for all files. save song name something like songs/asdfsdjflkfj.mpeg
-    // or playlist_photos/jfadlskjs.png
-    public PhotoFile savePhoto (MultipartFile file) {
-        try {
-            if (!Files.exists(root)) {
-                Files.createDirectory(root);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException();
-        }
-
-        try {
-            String filename = String.valueOf(UUID.randomUUID());
-            String path = root + "/" + filename + "." + file.getContentType().split("/")[1];
-            Files.write(Paths.get(path), file.getBytes());
-            filename = filename + "." + file.getContentType().split("/")[1];
-
-            File image = new File(path);
-            BufferedImage bufferedImage = ImageIO.read(image);
-            var croppedImage = cropImage(bufferedImage, 0, 0, 300, 300);
-            File pathFile = new File(path);
-            ImageIO.write(croppedImage,"jpg", pathFile);
-
-            PhotoFile model = new PhotoFile(filename, file.getContentType());
-            photoFileRepository.save(model);
-
-            return model;
-        } catch (Exception e) {
-            //Todo: change exception
-            throw new CustomException("io err", HttpStatus.MULTI_STATUS);
-        }
-    }
-
-    public static BufferedImage cropImage (BufferedImage bufferedImage, int x, int y, int width, int height) {
-        BufferedImage croppedImage = bufferedImage.getSubimage(x, y, width, height);
-        return croppedImage;
     }
 
     public void updatePlaylist (Long playlistId, PlaylistDto playlistDto) {
@@ -157,7 +104,7 @@ public class PlaylistService {
                     new PlaylistResponseDto(
                             p.getId(),
                             p.getName(),
-                            p.getPhoto().getFileName(),
+                            p.getPhoto(),
                             null
                     )
             );

@@ -19,11 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -36,6 +34,7 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
 //    private final VerificationTokenRepository verificationTokenRepository;
     private final MailService mailService;
+    private final FileUploadService fileUploadService;
 
     public UserService (
             UserRepository userRepository,
@@ -43,8 +42,8 @@ public class UserService {
             JwtTokenProvider jwtTokenProvider,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
-            MailService mailService
-    ) {
+            MailService mailService,
+            FileUploadService fileUploadService) {
         this.userRepository = userRepository;
         this.playlistRepository = playlistRepository;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -52,6 +51,7 @@ public class UserService {
         this.authenticationManager = authenticationManager;
 //        this.verificationTokenRepository = verificationTokenRepository;
         this.mailService = mailService;
+        this.fileUploadService = fileUploadService;
     }
 
     public String login(String username, String password) {
@@ -73,6 +73,7 @@ public class UserService {
                     passwordEncoder.encode(userDto.getPassword()),
                     userDto.getFirstName(),
                     userDto.getLastName(),
+                    "default_user.png",
                     new Date().toInstant(),
                     null,
                     UserRole.STUDENT.getRole(),
@@ -82,9 +83,9 @@ public class UserService {
             userRepository.save(user);
 
             //Todo: correct file name
-            var uploadsPlaylist = new Playlist(user, "Uploads", new PhotoFile("default.png", ".png"), PlayListState.PRIVATE);
-            var likedPlaylist = new Playlist(user, "Liked", new PhotoFile("liked.png", ".png"), PlayListState.PRIVATE);
-            var historyPlaylist = new Playlist(user, "History", new PhotoFile("default.png", ".png"), PlayListState.PRIVATE);
+            var uploadsPlaylist = new Playlist(user, "Uploads", "default.png", PlayListState.PRIVATE);
+            var likedPlaylist = new Playlist(user, "Liked", "liked.png", PlayListState.PRIVATE);
+            var historyPlaylist = new Playlist(user, "History", "default.png", PlayListState.PRIVATE);
 
             playlistRepository.save(uploadsPlaylist);
             playlistRepository.save(likedPlaylist);
@@ -150,7 +151,8 @@ public class UserService {
                 channel.getSubscriptions().size(),
                 channel.getSubscribers().size(),
                 channel.getPlaylists().get(0).getSongs().size(),
-                channel.getEmail()
+                channel.getEmail(),
+                channel.getProfilePhoto()
         );
 
         return userProfileDto;
@@ -166,7 +168,8 @@ public class UserService {
                 user.getSubscriptions().size(),
                 user.getSubscribers().size(),
                 user.getPlaylists().get(0).getSongs().size(),
-                user.getEmail()
+                user.getEmail(),
+                user.getProfilePhoto()
         );
 
         return userProfileDto;
@@ -187,7 +190,8 @@ public class UserService {
                     u.getSubscriptions().size(),
                     u.getSubscribers().size(),
                     u.getPlaylists().get(0).getSongs().size(),
-                    u.getEmail()
+                    u.getEmail(),
+                    u.getProfilePhoto()
             ));
         }
 
@@ -200,7 +204,8 @@ public class UserService {
                     u.getSubscriptions().size(),
                     u.getSubscribers().size(),
                     u.getPlaylists().get(0).getSongs().size(),
-                    u.getEmail()
+                    u.getEmail(),
+                    u.getProfilePhoto()
             ));
         }
 
@@ -209,6 +214,10 @@ public class UserService {
 
     public void updateUser (String username, UserUpdateDto user) {
         var userToUpdate = userRepository.findByUsername(username);
+
+        if (!userToUpdate.getProfilePhoto().equals(user.getAvatar().getOriginalFilename())) {
+            userToUpdate.setProfilePhoto(fileUploadService.saveAvatars(user.getAvatar()));
+        }
 
         userToUpdate.setEmail(user.getEmail());
         userToUpdate.setFirstName(user.getFirstName());

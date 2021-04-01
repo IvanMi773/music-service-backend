@@ -40,6 +40,8 @@ public class User {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
+    private String profilePhoto;
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_subscriptions",
@@ -70,6 +72,7 @@ public class User {
             String password,
             String firstName,
             String lastName,
+            String profilePhoto,
             Instant created_at,
             Instant enabled_at,
             String role,
@@ -81,6 +84,7 @@ public class User {
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.profilePhoto = profilePhoto;
         this.created_at = created_at;
         this.enabled_at = enabled_at;
         this.role = role;
@@ -225,5 +229,13 @@ public class User {
 
     public void setSubscribers (Set<User> subscribers) {
         this.subscribers = subscribers;
+    }
+
+    public String getProfilePhoto () {
+        return profilePhoto;
+    }
+
+    public void setProfilePhoto (String profilePhoto) {
+        this.profilePhoto = profilePhoto;
     }
 }

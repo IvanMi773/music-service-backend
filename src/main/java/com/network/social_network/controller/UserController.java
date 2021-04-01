@@ -5,10 +5,19 @@ import com.network.social_network.dto.user.UserProfileDto;
 import com.network.social_network.dto.user.UserUpdateDto;
 import com.network.social_network.repository.UserRepository;
 import com.network.social_network.service.UserService;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 @RestController
 @RequestMapping("/api/user")
@@ -28,12 +37,19 @@ public class UserController {
     }
 
     @GetMapping("/u/{username}")
-    public UserLibraryDto getUsernameById (@PathVariable("username") String username) {
+    public UserLibraryDto getUserByUsername (@PathVariable("username") String username) {
         return userService.getUserByUsername(username);
     }
 
     @PutMapping("/update")
-    public HttpStatus updateUserByUsername (@AuthenticationPrincipal User userToUpdate, @RequestBody UserUpdateDto user) {
+    public HttpStatus updateUser (
+            @AuthenticationPrincipal User userToUpdate,
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
+            @RequestParam("email") String email,
+            @RequestParam("avatar") MultipartFile avatar
+    ) {
+        var user = new UserUpdateDto(email, firstName, lastName, avatar);
         userService.updateUser(userToUpdate.getUsername(), user);
 
         return HttpStatus.OK;
@@ -48,6 +64,19 @@ public class UserController {
         var channel = userRepository.findByUsername(channelName);
 
         return userService.changeSubscription(channel, subscriber);
+    }
+
+    @GetMapping("/avatar/{avatar}")
+    public ResponseEntity getAvatar (@PathVariable String avatar) throws FileNotFoundException {
+        String file = "uploads/playlist_photos/" + avatar;
+
+        long length = new File(file).length();
+
+        InputStreamResource inputStreamResource = new InputStreamResource( new FileInputStream(file));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentLength(length);
+        httpHeaders.setCacheControl(CacheControl.noCache().getHeaderValue());
+        return new ResponseEntity(inputStreamResource, httpHeaders, HttpStatus.OK);
     }
 
     @DeleteMapping("/{username}")
