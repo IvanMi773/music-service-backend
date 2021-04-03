@@ -10,6 +10,7 @@ import com.network.social_network.repository.PlaylistRepository;
 import com.network.social_network.repository.UserRepository;
 //import com.network.social_network.repository.VerificationTokenRepository;
 import com.network.social_network.security.jwt.JwtTokenProvider;
+import com.network.social_network.service.elasticsearch.UserElasticSearchService;
 import com.network.social_network.service.mail.MailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,15 +36,16 @@ public class UserService {
 //    private final VerificationTokenRepository verificationTokenRepository;
     private final MailService mailService;
     private final FileUploadService fileUploadService;
+    private final UserElasticSearchService userElasticSearchService;
 
-    public UserService (
+    public UserService(
             UserRepository userRepository,
             PlaylistRepository playlistRepository,
             JwtTokenProvider jwtTokenProvider,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
             MailService mailService,
-            FileUploadService fileUploadService) {
+            FileUploadService fileUploadService, UserElasticSearchService userElasticSearchService) {
         this.userRepository = userRepository;
         this.playlistRepository = playlistRepository;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -52,6 +54,7 @@ public class UserService {
 //        this.verificationTokenRepository = verificationTokenRepository;
         this.mailService = mailService;
         this.fileUploadService = fileUploadService;
+        this.userElasticSearchService = userElasticSearchService;
     }
 
     public String login(String username, String password) {
@@ -82,7 +85,16 @@ public class UserService {
             );
             userRepository.save(user);
 
-            //Todo: correct file name
+            userElasticSearchService.save(new com.network.social_network.mapping.User(
+                    user.getUsername(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getSubscriptions().size(),
+                    user.getSubscribers().size(),
+                    0,
+                    user.getProfilePhoto()
+            ));
+
             var uploadsPlaylist = new Playlist(user, "Uploads", "default.png", PlayListState.PRIVATE);
             var likedPlaylist = new Playlist(user, "Liked", "liked.png", PlayListState.PRIVATE);
             var historyPlaylist = new Playlist(user, "History", "default.png", PlayListState.PRIVATE);

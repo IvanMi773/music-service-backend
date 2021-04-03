@@ -7,6 +7,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -48,7 +50,7 @@ public class User {
             joinColumns = @JoinColumn(name = "subscriber_id"),
             inverseJoinColumns = @JoinColumn(name = "channel_id")
     )
-    private Set<User> subscriptions;
+    private Set<User> subscriptions = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
@@ -56,7 +58,7 @@ public class User {
             joinColumns = @JoinColumn(name = "channel_id"),
             inverseJoinColumns = @JoinColumn(name = "subscriber_id")
     )
-    private Set<User> subscribers;
+    private Set<User> subscribers = new HashSet<>();
 
     private Instant created_at;
     private Instant enabled_at;

@@ -8,7 +8,6 @@ import com.network.social_network.service.SongService;
 //import com.network.social_network.service.elasticsearch.SongElasticsearchService;
 import com.network.social_network.service.elasticsearch.SongElasticsearchService;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -117,11 +116,6 @@ public class SongController {
         songService.deleteSongById(songId);
 
         return HttpStatus.OK;
-    }
-
-    @GetMapping("/find/{songName}")
-    public Page<Song> findByName (@PathVariable("songName") String songName) {
-        return elasticsearchService.findByName(songName);
     }
 }
 
