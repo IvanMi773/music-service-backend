@@ -3,8 +3,12 @@ package com.network.social_network.controller;
 import com.network.social_network.dto.song.SongLikesDto;
 import com.network.social_network.dto.song.SongRequestDto;
 import com.network.social_network.dto.song.SongResponseDto;
+import com.network.social_network.mapping.Song;
 import com.network.social_network.service.SongService;
+//import com.network.social_network.service.elasticsearch.SongElasticsearchService;
+import com.network.social_network.service.elasticsearch.SongElasticsearchService;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -25,9 +29,11 @@ import java.util.List;
 public class SongController {
 
     private final SongService songService;
+    private final SongElasticsearchService elasticsearchService;
 
-    public SongController (SongService songService) {
+    public SongController(SongService songService, SongElasticsearchService elasticsearchService) {
         this.songService = songService;
+        this.elasticsearchService = elasticsearchService;
     }
 
     @GetMapping
@@ -112,4 +118,10 @@ public class SongController {
 
         return HttpStatus.OK;
     }
+
+    @GetMapping("/find/{songName}")
+    public Page<Song> findByName (@PathVariable("songName") String songName) {
+        return elasticsearchService.findByName(songName);
+    }
 }
+

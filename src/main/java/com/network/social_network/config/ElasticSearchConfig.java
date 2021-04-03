@@ -2,6 +2,7 @@ package com.network.social_network.config;
 
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.RestClients;
@@ -13,7 +14,8 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 // Y9Wfh0J4QeY88jv5x8kxe9EJ
 
 @Configuration
-@EnableElasticsearchRepositories(basePackages = "com.network.social_network.repository")
+@EnableElasticsearchRepositories(basePackages = "com.network.social_network.repository.elasticsearch")
+@ComponentScan(basePackages = { "con.network.social_network.service.elasticsearch" })
 public class ElasticSearchConfig {
 
     @Bean

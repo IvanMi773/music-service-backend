@@ -68,7 +68,7 @@ public class UserController {
 
     @GetMapping("/avatar/{avatar}")
     public ResponseEntity getAvatar (@PathVariable String avatar) throws FileNotFoundException {
-        String file = "uploads/playlist_photos/" + avatar;
+        String file = "uploads/avatars/" + avatar;
 
         long length = new File(file).length();
 
