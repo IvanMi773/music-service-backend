@@ -1,24 +1,28 @@
 package com.network.social_network.dto.user;
 
+import com.network.social_network.model.User;
+
+import java.util.Set;
+
 public class UserProfileDto {
 
     private Long id;
     private String username;
     private String firstName;
     private String lastName;
-    private Integer subscriptions;
-    private Integer subscribers;
+    private Set<User> subscriptions;
+    private Set<User> subscribers;
     private Integer tracks;
     private String email;
     private String avatar;
 
-    public UserProfileDto (
+    public UserProfileDto(
             Long id,
             String username,
             String firstName,
             String lastName,
-            Integer subscriptions,
-            Integer subscribers,
+            Set<User> subscriptions,
+            Set<User> subscribers,
             Integer tracks,
             String email,
             String avatar
@@ -74,19 +78,19 @@ public class UserProfileDto {
         this.lastName = lastName;
     }
 
-    public Integer getSubscriptions () {
+    public Set<User>  getSubscriptions () {
         return subscriptions;
     }
 
-    public void setSubscriptions (Integer subscriptions) {
+    public void setSubscriptions (Set<User>  subscriptions) {
         this.subscriptions = subscriptions;
     }
 
-    public Integer getSubscribers () {
+    public Set<User>  getSubscribers () {
         return subscribers;
     }
 
-    public void setSubscribers (Integer subscribers) {
+    public void setSubscribers (Set<User>  subscribers) {
         this.subscribers = subscribers;
     }
 

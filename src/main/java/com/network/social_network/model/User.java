@@ -20,9 +20,11 @@ public class User {
     private Long id;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Playlist> playlists;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Comment> comments;
 
     @Email
@@ -42,7 +44,7 @@ public class User {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
-    private String profilePhoto;
+    private String avatar;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
@@ -50,6 +52,7 @@ public class User {
             joinColumns = @JoinColumn(name = "subscriber_id"),
             inverseJoinColumns = @JoinColumn(name = "channel_id")
     )
+    @JsonIgnore
     private Set<User> subscriptions = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -58,6 +61,7 @@ public class User {
             joinColumns = @JoinColumn(name = "channel_id"),
             inverseJoinColumns = @JoinColumn(name = "subscriber_id")
     )
+    @JsonIgnore
     private Set<User> subscribers = new HashSet<>();
 
     private Instant created_at;
@@ -74,7 +78,7 @@ public class User {
             String password,
             String firstName,
             String lastName,
-            String profilePhoto,
+            String avatar,
             Instant created_at,
             Instant enabled_at,
             String role,
@@ -86,7 +90,7 @@ public class User {
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.profilePhoto = profilePhoto;
+        this.avatar = avatar;
         this.created_at = created_at;
         this.enabled_at = enabled_at;
         this.role = role;
@@ -233,11 +237,11 @@ public class User {
         this.subscribers = subscribers;
     }
 
-    public String getProfilePhoto () {
-        return profilePhoto;
+    public String getAvatar () {
+        return avatar;
     }
 
-    public void setProfilePhoto (String profilePhoto) {
-        this.profilePhoto = profilePhoto;
+    public void setAvatar (String avatar) {
+        this.avatar = avatar;
     }
 }

@@ -1,7 +1,7 @@
 package com.network.social_network.service;
 
 import com.network.social_network.dto.user.UserDto;
-import com.network.social_network.dto.user.UserLibraryDto;
+//import com.network.social_network.dto.user.UserLibraryDto;
 import com.network.social_network.dto.user.UserProfileDto;
 import com.network.social_network.dto.user.UserUpdateDto;
 import com.network.social_network.exception.CustomException;
@@ -92,7 +92,7 @@ public class UserService {
                     user.getSubscriptions().size(),
                     user.getSubscribers().size(),
                     0,
-                    user.getProfilePhoto()
+                    user.getAvatar()
             ));
 
             var uploadsPlaylist = new Playlist(user, "Uploads", "default.png", PlayListState.PRIVATE);
@@ -154,17 +154,27 @@ public class UserService {
         }
 
         userRepository.save(channel);
+        userElasticSearchService.update(channel.getUsername(), channel);
+//        userElasticSearchService.save(new com.network.social_network.mapping.User(
+//                channel.getUsername(),
+//                channel.getFirstName(),
+//                channel.getLastName(),
+//                channel.getSubscriptions().size(),
+//                channel.getSubscribers().size(),
+//                channel.getPlaylists().get(0).getSongs().size(),
+//                channel.getAvatar()
+//        ));
 
         var userProfileDto = new UserProfileDto(
                 channel.getId(),
                 channel.getUsername(),
                 channel.getFirstName(),
                 channel.getLastName(),
-                channel.getSubscriptions().size(),
-                channel.getSubscribers().size(),
+                channel.getSubscriptions(),
+                channel.getSubscribers(),
                 channel.getPlaylists().get(0).getSongs().size(),
                 channel.getEmail(),
-                channel.getProfilePhoto()
+                channel.getAvatar()
         );
 
         return userProfileDto;
@@ -177,58 +187,60 @@ public class UserService {
                 user.getUsername(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getSubscriptions().size(),
-                user.getSubscribers().size(),
+                user.getSubscriptions(),
+                user.getSubscribers(),
                 user.getPlaylists().get(0).getSongs().size(),
                 user.getEmail(),
-                user.getProfilePhoto()
+                user.getAvatar()
         );
 
         return userProfileDto;
     }
 
-    public UserLibraryDto getUserByUsername (String username) {
-        //Todo: create enum 'playlist name' (history, liked, uploads)
-        var user = userRepository.findByUsername(username);
-        var subscribers = new HashSet<UserProfileDto>();
-        var subscriptions = new HashSet<UserProfileDto>();
-
-        for (User u : user.getSubscribers()) {
-            subscribers.add(new UserProfileDto(
-                    u.getId(),
-                    u.getUsername(),
-                    u.getFirstName(),
-                    u.getLastName(),
-                    u.getSubscriptions().size(),
-                    u.getSubscribers().size(),
-                    u.getPlaylists().get(0).getSongs().size(),
-                    u.getEmail(),
-                    u.getProfilePhoto()
-            ));
-        }
-
-        for (User u : user.getSubscriptions()) {
-            subscriptions.add(new UserProfileDto(
-                    u.getId(),
-                    u.getUsername(),
-                    u.getFirstName(),
-                    u.getLastName(),
-                    u.getSubscriptions().size(),
-                    u.getSubscribers().size(),
-                    u.getPlaylists().get(0).getSongs().size(),
-                    u.getEmail(),
-                    u.getProfilePhoto()
-            ));
-        }
-
-        return new UserLibraryDto(subscribers, subscriptions);
-    }
+//    public UserLibraryDto getUserByUsername (String viewerUsername, String username) {
+//        //Todo: create enum 'playlist name' (history, liked, uploads)
+//        var user = userRepository.findByUsername(username);
+//        var subscribers = new HashSet<UserProfileDto>();
+//        var subscriptions = new HashSet<UserProfileDto>();
+//
+//        for (User u : user.getSubscribers()) {
+//            subscribers.add(new UserProfileDto(
+//                    u.getId(),
+//                    u.getUsername(),
+//                    u.getFirstName(),
+//                    u.getLastName(),
+//                    u.getSubscriptions(),
+//                    u.getSubscribers(),
+//                    u.getPlaylists().get(0).getSongs().size(),
+//                    u.getEmail(),
+//                    u.getProfilePhoto(),
+//                    u.getSubscribers().contains(userRepository.findByUsername(viewerUsername)))
+//            );
+//        }
+//
+//        for (User u : user.getSubscriptions()) {
+//            subscriptions.add(new UserProfileDto(
+//                    u.getId(),
+//                    u.getUsername(),
+//                    u.getFirstName(),
+//                    u.getLastName(),
+//                    u.getSubscriptions(),
+//                    u.getSubscribers(),
+//                    u.getPlaylists().get(0).getSongs().size(),
+//                    u.getEmail(),
+//                    u.getProfilePhoto(),
+//                    u.getSubscribers().contains(userRepository.findByUsername(viewerUsername)))
+//            );
+//        }
+//
+//        return new UserLibraryDto(subscribers, subscriptions);
+//    }
 
     public void updateUser (String username, UserUpdateDto user) {
         var userToUpdate = userRepository.findByUsername(username);
 
-        if (!userToUpdate.getProfilePhoto().equals(user.getAvatar().getOriginalFilename())) {
-            userToUpdate.setProfilePhoto(fileUploadService.saveAvatars(user.getAvatar()));
+        if (!userToUpdate.getAvatar().equals(user.getAvatar().getOriginalFilename())) {
+            userToUpdate.setAvatar(fileUploadService.saveAvatars(user.getAvatar()));
         }
 
         userToUpdate.setEmail(user.getEmail());
@@ -236,6 +248,16 @@ public class UserService {
         userToUpdate.setLastName(user.getLastName());
 
         userRepository.save(userToUpdate);
+        userElasticSearchService.update(username, userToUpdate);
+//        userElasticSearchService.save(new com.network.social_network.mapping.User(
+//                userToUpdate.getUsername(),
+//                userToUpdate.getFirstName(),
+//                userToUpdate.getLastName(),
+//                userToUpdate.getSubscriptions().size(),
+//                userToUpdate.getSubscribers().size(),
+//                userToUpdate.getPlaylists().get(0).getSongs().size(),
+//                userToUpdate.getAvatar()
+//        ));
     }
 
     public void delete (String username) {

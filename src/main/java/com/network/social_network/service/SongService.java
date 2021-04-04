@@ -99,15 +99,16 @@ public class SongService {
         );
         song.addPlaylist(user.getPlaylists().get(0));
 
+        song = songRepository.save(song);
+
         songElasticsearchService.save(new com.network.social_network.mapping.Song(
+                song.getId(),
                 song.getName(),
                 song.getGenre().getName(),
                 user.getUsername(),
                 song.getSongFile().getFileName(),
                 song.getSongFile().getDuration()
         ));
-
-        songRepository.save(song);
     }
 
     public void updateSong (Long songId, SongRequestDto songRequestDto) {

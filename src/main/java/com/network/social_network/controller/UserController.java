@@ -1,6 +1,6 @@
 package com.network.social_network.controller;
 
-import com.network.social_network.dto.user.UserLibraryDto;
+//import com.network.social_network.dto.user.UserLibraryDto;
 import com.network.social_network.dto.user.UserProfileDto;
 import com.network.social_network.dto.user.UserUpdateDto;
 import com.network.social_network.repository.UserRepository;
@@ -36,10 +36,13 @@ public class UserController {
         return userService.getUserProfileDtoByUsername(username);
     }
 
-    @GetMapping("/u/{username}")
-    public UserLibraryDto getUserByUsername (@PathVariable("username") String username) {
-        return userService.getUserByUsername(username);
-    }
+//    @GetMapping("/u/{username}")
+//    public UserLibraryDto getUserByUsername (
+//            @AuthenticationPrincipal User userdetails,
+//            @PathVariable("username") String username
+//    ) {
+//        return userService.getUserByUsername(userdetails.getUsername(), username);
+//    }
 
     @PutMapping("/update")
     public HttpStatus updateUser (

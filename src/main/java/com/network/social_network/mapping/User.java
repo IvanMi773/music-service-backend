@@ -32,7 +32,15 @@ public class User {
     @Field(type = FieldType.Text, name = "avatar")
     private String avatar;
 
-    public User(String username, String firstName, String lastName, Integer subscriptions, Integer subscribers, Integer tracks, String avatar) {
+    public User(
+            String username,
+            String firstName,
+            String lastName,
+            Integer subscriptions,
+            Integer subscribers,
+            Integer tracks,
+            String avatar
+    ) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;

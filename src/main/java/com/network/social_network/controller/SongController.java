@@ -72,12 +72,12 @@ public class SongController {
 
     @PostMapping
     public HashMap<String, String> createSong (
-            @RequestParam("username") String username,
+            @AuthenticationPrincipal User user,
             @RequestParam("title") String name,
             @RequestParam("file") MultipartFile file,
             @RequestParam("genre") Long genreId
     ) {
-        var songDto = new SongRequestDto(username, name, file, genreId);
+        var songDto = new SongRequestDto(user.getUsername(), name, file, genreId);
         songService.createSong(songDto);
 
         HashMap<String, String> response = new HashMap<>();

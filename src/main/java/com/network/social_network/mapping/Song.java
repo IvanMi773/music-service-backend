@@ -9,7 +9,10 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 public class Song {
 
     @Id
-    private String id;
+    private String indexId;
+
+    @Field(type = FieldType.Long, name = "songId")
+    private Long id;
 
     @Field(type = FieldType.Text, name = "name")
     private String name;
@@ -26,7 +29,8 @@ public class Song {
     @Field(type = FieldType.Integer, name = "duration")
     private Integer duration;
 
-    public Song(String name, String genre, String username, String file, Integer duration) {
+    public Song(Long id, String name, String genre, String username, String file, Integer duration) {
+        this.id = id;
         this.name = name;
         this.genre = genre;
         this.username = username;
@@ -34,12 +38,12 @@ public class Song {
         this.duration = duration;
     }
 
-    public String getId () {
-        return id;
+    public String getIndexId () {
+        return indexId;
     }
 
-    public void setId (String id) {
-        this.id = id;
+    public void setIndexId (String id) {
+        this.indexId = id;
     }
 
     public String getName () {
@@ -80,5 +84,13 @@ public class Song {
 
     public void setDuration(Integer duration) {
         this.duration = duration;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long songId) {
+        this.id = songId;
     }
 }

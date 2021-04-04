@@ -15,6 +15,23 @@ public class SongElasticsearchService {
         this.songElasticsearchRepository = songElasticsearchRepository;
     }
 
+    public void removeAll () {
+        this.songElasticsearchRepository.deleteAll();
+    }
+
+    public void saveAll (List<com.network.social_network.model.Song> songs) {
+        for ( var s : songs) {
+            songElasticsearchRepository.save(new com.network.social_network.mapping.Song(
+                    s.getId(),
+                    s.getName(),
+                    s.getGenre().getName(),
+                    s.getPlaylists().get(0).getUser().getUsername(),
+                    s.getSongFile().getFileName(),
+                    s.getSongFile().getDuration()
+            ));
+        }
+    }
+
     public void save (Song song) {
         this.songElasticsearchRepository.save(song);
     }
