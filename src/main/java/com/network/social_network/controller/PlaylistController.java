@@ -9,6 +9,8 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +31,7 @@ public class PlaylistController {
     }
 
     @GetMapping
-    public List<Playlist> getAllPlaylists () {
+    public List<PlaylistResponseDto> getAllPlaylists () {
         return playlistService.getAll();
     }
 
@@ -40,13 +42,13 @@ public class PlaylistController {
 
     @PostMapping
     public HashMap<String, String> createPlaylist (
-            @RequestParam("username") String username,
+            @AuthenticationPrincipal User user,
             @RequestParam("name") String name,
             @RequestParam("photo") MultipartFile photo,
             @RequestParam("state") Integer state
     ) {
-        var playlistDto = new PlaylistDto(username, name, photo, state);
-        playlistService.createPlaylist(playlistDto);
+        var playlistDto = new PlaylistDto(name, photo, state);
+        playlistService.createPlaylist(user.getUsername(), playlistDto);
 
         HashMap<String, String> response = new HashMap<>();
         response.put("ok", String.valueOf(HttpStatus.OK));
@@ -55,8 +57,11 @@ public class PlaylistController {
     }
 
     @PostMapping("/{playlistId}")
-    public HashMap<String, String> updatePlaylist (@PathVariable Long playlistId, @RequestBody PlaylistDto songDto) {
-        playlistService.updatePlaylist(playlistId, songDto);
+    public HashMap<String, String> updatePlaylist (
+            @PathVariable Long playlistId,
+            @RequestBody PlaylistDto playlistDto
+    ) {
+        playlistService.updatePlaylist(playlistId, playlistDto);
 
         HashMap<String, String> response = new HashMap<>();
         response.put("ok", String.valueOf(HttpStatus.OK));
@@ -85,7 +90,7 @@ public class PlaylistController {
     }
 
     @DeleteMapping("/{playlistId}")
-    public HttpStatus deletePost (@PathVariable Long playlistId) {
+    public HttpStatus deletePlaylist (@PathVariable Long playlistId) {
         playlistService.deletePlaylistById(playlistId);
 
         return HttpStatus.OK;

@@ -1,10 +1,12 @@
 package com.network.social_network.service.elasticsearch;
 
+import com.network.social_network.dto.user.UserProfileDto;
 import com.network.social_network.mapping.User;
 import com.network.social_network.repository.UserRepository;
 import com.network.social_network.repository.elasticsearch.UserElasticSearchRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,12 +23,7 @@ public class UserElasticSearchService {
     public void update (String username, com.network.social_network.model.User user) {
         var userToUpdate = userElasticSearchRepository.findByUsername(username).get(0);
         userToUpdate.setUsername(user.getUsername());
-        userToUpdate.setFirstName(user.getFirstName());
-        userToUpdate.setLastName(user.getLastName());
-        userToUpdate.setSubscriptions(user.getSubscriptions().size());
-        userToUpdate.setSubscribers(user.getSubscribers().size());
-        userToUpdate.setTracks(user.getPlaylists().get(0).getSongs().size());
-        userToUpdate.setAvatar(user.getAvatar());
+        userToUpdate.setId(user.getId());
 
         userElasticSearchRepository.save(userToUpdate);
     }
@@ -35,8 +32,26 @@ public class UserElasticSearchService {
         this.userElasticSearchRepository.save(user);
     }
 
-    public List<User> findByUsername (String username) {
-        return this.userElasticSearchRepository.findByUsername(username);
+    public ArrayList<UserProfileDto> findByUsername (String username) {
+        var userDtos = new ArrayList<UserProfileDto>();
+
+        for (var u : this.userElasticSearchRepository.findByUsername(username)) {
+            var user = userRepository.findByUsername(u.getUsername());
+            userDtos.add(new UserProfileDto(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getSubscriptions(),
+                    user.getSubscribers(),
+                    user.getPlaylists().get(0).getSongs().size(),
+                    user.getEmail(),
+                    user.getAvatar(),
+                    user.getRole()
+            ));
+        }
+
+        return userDtos;
     }
 
     public void removeAll () {
@@ -46,13 +61,8 @@ public class UserElasticSearchService {
     public void saveAll (List<com.network.social_network.model.User> users) {
         for ( var u : users) {
             userElasticSearchRepository.save(new User(
-                    u.getUsername(),
-                    u.getFirstName(),
-                    u.getLastName(),
-                    u.getSubscriptions().size(),
-                    u.getSubscribers().size(),
-                    u.getPlaylists().size() > 0 ? u.getPlaylists().get(0).getSongs().size() : 0,
-                    u.getAvatar()
+                    u.getId(),
+                    u.getUsername()
             ));
         }
     }

@@ -17,25 +17,9 @@ public class Song {
     @Field(type = FieldType.Text, name = "name")
     private String name;
 
-    @Field(type = FieldType.Text, name = "genre")
-    private String genre;
-
-    @Field(type = FieldType.Text, name = "username")
-    private String username;
-
-    @Field(type = FieldType.Text, name = "file")
-    private String file;
-
-    @Field(type = FieldType.Integer, name = "duration")
-    private Integer duration;
-
-    public Song(Long id, String name, String genre, String username, String file, Integer duration) {
+    public Song (Long id, String name) {
         this.id = id;
         this.name = name;
-        this.genre = genre;
-        this.username = username;
-        this.file = file;
-        this.duration = duration;
     }
 
     public String getIndexId () {
@@ -52,38 +36,6 @@ public class Song {
 
     public void setName (String name) {
         this.name = name;
-    }
-
-    public String getGenre () {
-        return genre;
-    }
-
-    public void setGenre (String genre) {
-        this.genre = genre;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getFile() {
-        return file;
-    }
-
-    public void setFile(String file) {
-        this.file = file;
-    }
-
-    public Integer getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Integer duration) {
-        this.duration = duration;
     }
 
     public Long getId() {

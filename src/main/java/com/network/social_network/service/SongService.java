@@ -1,6 +1,5 @@
 package com.network.social_network.service;
 
-import com.network.social_network.dto.song.SongLikesDto;
 import com.network.social_network.dto.song.SongRequestDto;
 import com.network.social_network.dto.song.SongResponseDto;
 import com.network.social_network.exception.CustomException;
@@ -58,7 +57,8 @@ public class SongService {
                         song.getName(),
                         song.getGenre().getName(),
                         song.getSongFile().getFileName(),
-                        song.getSongFile().getDuration()
+                        song.getSongFile().getDuration(),
+                        song.getLikes()
                 );
                 songs.add(songDto);
             }
@@ -80,7 +80,8 @@ public class SongService {
                             song.getName(),
                             song.getGenre().getName(),
                             song.getSongFile().getFileName(),
-                            song.getSongFile().getDuration()
+                            song.getSongFile().getDuration(),
+                            song.getLikes()
                     )
             );
         }
@@ -103,16 +104,13 @@ public class SongService {
 
         songElasticsearchService.save(new com.network.social_network.mapping.Song(
                 song.getId(),
-                song.getName(),
-                song.getGenre().getName(),
-                user.getUsername(),
-                song.getSongFile().getFileName(),
-                song.getSongFile().getDuration()
+                song.getName()
         ));
     }
 
     public void updateSong (Long songId, SongRequestDto songRequestDto) {
         //Todo: correct update
+        //Todo: створювати неіснуючі жанри на бекенді (перевіряти чи жанр існує і якщо ні - створювати)
         var song = songRepository.findById(songId).orElseThrow(
                 () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
         );
@@ -129,7 +127,7 @@ public class SongService {
         songRepository.deleteById(songId);
     }
 
-    public SongLikesDto updateLikesOfSong (Long songId, String username) {
+    public SongResponseDto updateLikesOfSong (Long songId, String username) {
         var song = songRepository.findById(songId).orElseThrow(
                 () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
         );
@@ -146,18 +144,26 @@ public class SongService {
 
         songRepository.save(song);
 
-        return new SongLikesDto(song.getId(), (long) song.getLikes().size(), song.getLikes().contains(user));
-    }
-
-    public SongLikesDto getLikesOfSong (Long songId, String username) {
-        var song = songRepository.findById(songId).orElseThrow(
-                () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
+        return new SongResponseDto(
+                song.getId(),
+                username,
+                song.getName(),
+                song.getGenre().getName(),
+                song.getSongFile().getFileName(),
+                song.getSongFile().getDuration(),
+                song.getLikes()
         );
-
-        var user = userRepository.findByUsername(username);
-
-        return new SongLikesDto(song.getId(), (long) song.getLikes().size(), song.getLikes().contains(user));
     }
+
+//    public SongLikesDto getLikesOfSong (Long songId, String username) {
+//        var song = songRepository.findById(songId).orElseThrow(
+//                () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
+//        );
+//
+//        var user = userRepository.findByUsername(username);
+//
+//        return new SongLikesDto(song.getId(), (long) song.getLikes().size(), song.getLikes().contains(user));
+//    }
 
     public List<SongResponseDto> getSubscriptionsSongs (String username) {
 
@@ -172,8 +178,9 @@ public class SongService {
                         s.getName(),
                         s.getGenre().getName(),
                         s.getSongFile().getFileName(),
-                        s.getSongFile().getDuration()
-                ));
+                        s.getSongFile().getDuration(),
+                        s.getLikes())
+                );
             }
         }
 

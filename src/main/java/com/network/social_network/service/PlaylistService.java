@@ -30,8 +30,32 @@ public class PlaylistService {
         this.fileUploadService = fileUploadService;
     }
 
-    public List<Playlist> getAll () {
-        return playlistRepository.findAll();
+    public List<PlaylistResponseDto> getAll () {
+        var playlistResponseDtoList = new ArrayList<PlaylistResponseDto>();
+
+        for (var playlist : playlistRepository.findAll()) {
+            var songs = new ArrayList<SongResponseDto>();
+            for (Song s: playlist.getSongs()) {
+                songs.add(new SongResponseDto(
+                        s.getId(),
+                        playlist.getUser().getUsername(),
+                        s.getName(),
+                        s.getGenre().getName(),
+                        s.getSongFile().getFileName(),
+                        s.getSongFile().getDuration(),
+                        s.getLikes()
+                ));
+            }
+
+            playlistResponseDtoList.add(new PlaylistResponseDto(
+                    playlist.getId(),
+                    playlist.getName(),
+                    playlist.getPhoto(),
+                    songs,
+                    playlist.getUser().getUsername()
+            ));
+        }
+        return playlistResponseDtoList;
     }
 
     public PlaylistResponseDto getPlaylistById (Long playlistId) {
@@ -41,22 +65,23 @@ public class PlaylistService {
 
         var songs = new ArrayList<SongResponseDto>();
         for (Song s: playlist.getSongs()) {
-            var songDto = new SongResponseDto(
+            songs.add(new SongResponseDto(
                     s.getId(),
                     playlist.getUser().getUsername(),
                     s.getName(),
                     s.getGenre().getName(),
                     s.getSongFile().getFileName(),
-                    s.getSongFile().getDuration()
-            );
-            songs.add(songDto);
+                    s.getSongFile().getDuration(),
+                    s.getLikes()
+            ));
         }
 
         var playlistDto = new PlaylistResponseDto(
                 playlist.getId(),
                 playlist.getName(),
                 playlist.getPhoto(),
-                songs
+                songs,
+                playlist.getUser().getUsername()
         );
 
         return playlistDto;
@@ -66,13 +91,13 @@ public class PlaylistService {
         playlistRepository.deleteById(playlistId);
     }
 
-    public void createPlaylist (PlaylistDto playlistDto) {
+    public void createPlaylist (String username, PlaylistDto playlistDto) {
 
         var photoFile = fileUploadService.savePlaylistPhoto(playlistDto.getPhoto());
 
         //Todo: throw exception if user not found
         var playlist = new Playlist(
-                userRepository.findByUsername(playlistDto.getUsername()),
+                userRepository.findByUsername(username),
                 playlistDto.getName(),
                 photoFile,
                 playlistDto.getState() == 0 ? PlayListState.PRIVATE : PlayListState.PUBLIC
@@ -100,14 +125,13 @@ public class PlaylistService {
 
         for (Playlist p: user.getPlaylists()) {
 
-            playlists.add(
-                    new PlaylistResponseDto(
-                            p.getId(),
-                            p.getName(),
-                            p.getPhoto(),
-                            null
-                    )
-            );
+            playlists.add(new PlaylistResponseDto(
+                 p.getId(),
+                 p.getName(),
+                 p.getPhoto(),
+                 null,
+                 username
+            ));
         }
 
         return playlists;

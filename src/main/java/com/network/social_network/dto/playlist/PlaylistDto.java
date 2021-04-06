@@ -4,24 +4,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class PlaylistDto {
 
-    private String username;
     private String name;
     private MultipartFile photo;
     private Integer state;
 
-    public PlaylistDto (String username, String name, MultipartFile photo, Integer state) {
-        this.username = username;
+    public PlaylistDto (String name, MultipartFile photo, Integer state) {
         this.name = name;
         this.photo = photo;
         this.state = state;
-    }
-
-    public String getUsername () {
-        return username;
-    }
-
-    public void setUsername (String username) {
-        this.username = username;
     }
 
     public String getName () {

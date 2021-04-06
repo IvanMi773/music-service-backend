@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -31,18 +32,15 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
+    @GetMapping("/all")
+    public List<UserProfileDto> getAllUsers () {
+        return this.userService.getAll();
+    }
+
     @GetMapping("/{username}")
     public UserProfileDto getProfileByUsername (@PathVariable("username") String username) {
         return userService.getUserProfileDtoByUsername(username);
     }
-
-//    @GetMapping("/u/{username}")
-//    public UserLibraryDto getUserByUsername (
-//            @AuthenticationPrincipal User userdetails,
-//            @PathVariable("username") String username
-//    ) {
-//        return userService.getUserByUsername(userdetails.getUsername(), username);
-//    }
 
     @PutMapping("/update")
     public HttpStatus updateUser (

@@ -1,10 +1,9 @@
 package com.network.social_network.controller;
 
-import com.network.social_network.dto.user.UserDto;
-import com.network.social_network.dto.user.UserAuthenticationDto;
+import com.network.social_network.dto.user.UserRegistrationDto;
+import com.network.social_network.dto.user.UserLoginDto;
 import com.network.social_network.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -16,10 +15,8 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    //Todo: change privileges name
-
     @PostMapping(value = "/login")
-    public HashMap<String, String> login(@RequestBody UserAuthenticationDto request) {
+    public HashMap<String, String> login(@RequestBody UserLoginDto request) {
         HashMap<String, String> response = new HashMap<>();
         response.put("token", userService.login(request.getUsername(), request.getPassword()));
 
@@ -27,9 +24,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public HashMap<String, String> register(@RequestBody UserDto userDto) {
+    public HashMap<String, String> register(@RequestBody UserRegistrationDto userRegistrationDto) {
         HashMap<String, String> response = new HashMap<>();
-        response.put("token", userService.register(userDto));
+        response.put("token", userService.register(userRegistrationDto));
 
         return response;
     }

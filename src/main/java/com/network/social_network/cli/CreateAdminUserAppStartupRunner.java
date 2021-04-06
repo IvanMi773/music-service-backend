@@ -1,23 +1,22 @@
 package com.network.social_network.cli;
 
-import com.network.social_network.model.User;
+import com.network.social_network.dto.user.UserRegistrationDto;
 import com.network.social_network.repository.UserRepository;
-import com.network.social_network.model.UserRole;
+import com.network.social_network.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
 
 @Component
 public class CreateAdminUserAppStartupRunner implements CommandLineRunner {
 
-    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final UserService userService;
 
-    public CreateAdminUserAppStartupRunner (PasswordEncoder passwordEncoder, UserRepository userRepository) {
-        this.passwordEncoder = passwordEncoder;
+    @Autowired
+    public CreateAdminUserAppStartupRunner(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -25,21 +24,16 @@ public class CreateAdminUserAppStartupRunner implements CommandLineRunner {
         var user = userRepository.findByUsername("admin");
 
         if (user == null) {
-            var adminUser = new User(
+            var adminUser = new UserRegistrationDto(
+                    "admin",
                     "test@test.com",
+                    "password",
                     "admin",
-                    passwordEncoder.encode("password"),
                     "admin",
-                    "admin",
-                    "default_user.png",
-                    new Date().toInstant(),
-                    new Date().toInstant(),
-                    UserRole.ADMIN.getRole(),
-                    false,
-                    true
+                    0
             );
 
-            userRepository.save(adminUser);
+            userService.register(adminUser);
         }
     }
 }

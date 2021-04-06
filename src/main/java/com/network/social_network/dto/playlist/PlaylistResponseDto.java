@@ -10,17 +10,20 @@ public class PlaylistResponseDto {
     private String title;
     private String photo;
     private List<SongResponseDto> songs;
+    private String username;
 
-    public PlaylistResponseDto (
+    public PlaylistResponseDto(
             Long id,
             String title,
             String photo,
-            List<SongResponseDto> songs
+            List<SongResponseDto> songs,
+            String username
     ) {
         this.id = id;
         this.title = title;
         this.photo = photo;
         this.songs = songs;
+        this.username = username;
     }
 
     public List<SongResponseDto> getSongs () {
@@ -53,5 +56,13 @@ public class PlaylistResponseDto {
 
     public void setId (Long id) {
         this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

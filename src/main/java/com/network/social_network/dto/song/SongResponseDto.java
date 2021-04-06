@@ -1,5 +1,9 @@
 package com.network.social_network.dto.song;
 
+import com.network.social_network.model.User;
+
+import java.util.Set;
+
 public class SongResponseDto {
 
     private Long id;
@@ -8,14 +12,16 @@ public class SongResponseDto {
     private String genre;
     private String file;
     private Integer duration;
+    private Set<User> likes;
 
-    public SongResponseDto (
+    public SongResponseDto(
             Long id,
             String username,
             String name,
             String genre,
             String file,
-            Integer duration
+            Integer duration,
+            Set<User> likes
     ) {
         this.id = id;
         this.username = username;
@@ -23,6 +29,7 @@ public class SongResponseDto {
         this.genre = genre;
         this.file = file;
         this.duration = duration;
+        this.likes = likes;
     }
 
     public SongResponseDto () {
@@ -70,5 +77,13 @@ public class SongResponseDto {
 
     public void setDuration (Integer duration) {
         this.duration = duration;
+    }
+
+    public Set<User> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Set<User> likes) {
+        this.likes = likes;
     }
 }

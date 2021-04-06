@@ -9,52 +9,24 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 public class User {
 
     @Id
-    private String id;
+    private String indexId;
+
+    @Field(type = FieldType.Long, name = "userId")
+    private Long id;
 
     @Field(type = FieldType.Text, name = "username")
     private String username;
 
-    @Field(type = FieldType.Text, name = "firstName")
-    private String firstName;
-
-    @Field(type = FieldType.Text, name = "lastName")
-    private String lastName;
-
-    @Field(type = FieldType.Integer, name = "subscriptions")
-    private Integer subscriptions;
-
-    @Field(type = FieldType.Integer, name = "subscribers")
-    private Integer subscribers;
-
-    @Field(type = FieldType.Integer, name = "tracks")
-    private Integer tracks;
-
-    @Field(type = FieldType.Text, name = "avatar")
-    private String avatar;
-
-    public User(
-            String username,
-            String firstName,
-            String lastName,
-            Integer subscriptions,
-            Integer subscribers,
-            Integer tracks,
-            String avatar
-    ) {
+    public User(Long id, String username) {
+        this.id = id;
         this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.subscriptions = subscriptions;
-        this.subscribers = subscribers;
-        this.tracks = tracks;
-        this.avatar = avatar;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -66,51 +38,11 @@ public class User {
         this.username = username;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getIndexId() {
+        return indexId;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public Integer getSubscriptions() {
-        return subscriptions;
-    }
-
-    public void setSubscriptions(Integer subscriptions) {
-        this.subscriptions = subscriptions;
-    }
-
-    public Integer getSubscribers() {
-        return subscribers;
-    }
-
-    public void setSubscribers(Integer subscribers) {
-        this.subscribers = subscribers;
-    }
-
-    public Integer getTracks() {
-        return tracks;
-    }
-
-    public void setTracks(Integer tracks) {
-        this.tracks = tracks;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
+    public void setIndexId(String indexId) {
+        this.indexId = indexId;
     }
 }

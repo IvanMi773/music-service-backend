@@ -15,6 +15,7 @@ public class UserProfileDto {
     private Integer tracks;
     private String email;
     private String avatar;
+    private String role;
 
     public UserProfileDto(
             Long id,
@@ -25,7 +26,8 @@ public class UserProfileDto {
             Set<User> subscribers,
             Integer tracks,
             String email,
-            String avatar
+            String avatar,
+            String role
     ) {
         this.id = id;
         this.username = username;
@@ -36,6 +38,7 @@ public class UserProfileDto {
         this.tracks = tracks;
         this.email = email;
         this.avatar = avatar;
+        this.role = role;
     }
 
     public Long getId () {
@@ -108,5 +111,13 @@ public class UserProfileDto {
 
     public void setAvatar (String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

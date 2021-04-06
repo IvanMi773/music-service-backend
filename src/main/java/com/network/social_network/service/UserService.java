@@ -1,6 +1,6 @@
 package com.network.social_network.service;
 
-import com.network.social_network.dto.user.UserDto;
+import com.network.social_network.dto.user.UserRegistrationDto;
 //import com.network.social_network.dto.user.UserLibraryDto;
 import com.network.social_network.dto.user.UserProfileDto;
 import com.network.social_network.dto.user.UserUpdateDto;
@@ -20,8 +20,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -68,31 +69,26 @@ public class UserService {
         }
     }
 
-    public String register (UserDto userDto) {
-        if (!userRepository.existsByUsername(userDto.getUsername()) && !userRepository.existsByEmail(userDto.getEmail())) {
+    public String register (UserRegistrationDto userRegistrationDto) {
+        if (!userRepository.existsByUsername(userRegistrationDto.getUsername()) && !userRepository.existsByEmail(userRegistrationDto.getEmail())) {
             var user = new User(
-                    userDto.getEmail(),
-                    userDto.getUsername(),
-                    passwordEncoder.encode(userDto.getPassword()),
-                    userDto.getFirstName(),
-                    userDto.getLastName(),
+                    userRegistrationDto.getEmail(),
+                    userRegistrationDto.getUsername(),
+                    passwordEncoder.encode(userRegistrationDto.getPassword()),
+                    userRegistrationDto.getFirstName(),
+                    userRegistrationDto.getLastName(),
                     "default_user.png",
                     new Date().toInstant(),
                     null,
-                    UserRole.STUDENT.getRole(),
+                    userRegistrationDto.getRole() == 0 ? UserRole.ADMIN.getRole() : UserRole.USER.getRole(),
                     false,
                     false
             );
             userRepository.save(user);
 
             userElasticSearchService.save(new com.network.social_network.mapping.User(
-                    user.getUsername(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getSubscriptions().size(),
-                    user.getSubscribers().size(),
-                    0,
-                    user.getAvatar()
+                    user.getId(),
+                    user.getUsername()
             ));
 
             var uploadsPlaylist = new Playlist(user, "Uploads", "default.png", PlayListState.PRIVATE);
@@ -155,15 +151,6 @@ public class UserService {
 
         userRepository.save(channel);
         userElasticSearchService.update(channel.getUsername(), channel);
-//        userElasticSearchService.save(new com.network.social_network.mapping.User(
-//                channel.getUsername(),
-//                channel.getFirstName(),
-//                channel.getLastName(),
-//                channel.getSubscriptions().size(),
-//                channel.getSubscribers().size(),
-//                channel.getPlaylists().get(0).getSongs().size(),
-//                channel.getAvatar()
-//        ));
 
         var userProfileDto = new UserProfileDto(
                 channel.getId(),
@@ -174,7 +161,8 @@ public class UserService {
                 channel.getSubscribers(),
                 channel.getPlaylists().get(0).getSongs().size(),
                 channel.getEmail(),
-                channel.getAvatar()
+                channel.getAvatar(),
+                channel.getRole()
         );
 
         return userProfileDto;
@@ -191,52 +179,15 @@ public class UserService {
                 user.getSubscribers(),
                 user.getPlaylists().get(0).getSongs().size(),
                 user.getEmail(),
-                user.getAvatar()
+                user.getAvatar(),
+                user.getRole()
         );
 
         return userProfileDto;
     }
 
-//    public UserLibraryDto getUserByUsername (String viewerUsername, String username) {
-//        //Todo: create enum 'playlist name' (history, liked, uploads)
-//        var user = userRepository.findByUsername(username);
-//        var subscribers = new HashSet<UserProfileDto>();
-//        var subscriptions = new HashSet<UserProfileDto>();
-//
-//        for (User u : user.getSubscribers()) {
-//            subscribers.add(new UserProfileDto(
-//                    u.getId(),
-//                    u.getUsername(),
-//                    u.getFirstName(),
-//                    u.getLastName(),
-//                    u.getSubscriptions(),
-//                    u.getSubscribers(),
-//                    u.getPlaylists().get(0).getSongs().size(),
-//                    u.getEmail(),
-//                    u.getProfilePhoto(),
-//                    u.getSubscribers().contains(userRepository.findByUsername(viewerUsername)))
-//            );
-//        }
-//
-//        for (User u : user.getSubscriptions()) {
-//            subscriptions.add(new UserProfileDto(
-//                    u.getId(),
-//                    u.getUsername(),
-//                    u.getFirstName(),
-//                    u.getLastName(),
-//                    u.getSubscriptions(),
-//                    u.getSubscribers(),
-//                    u.getPlaylists().get(0).getSongs().size(),
-//                    u.getEmail(),
-//                    u.getProfilePhoto(),
-//                    u.getSubscribers().contains(userRepository.findByUsername(viewerUsername)))
-//            );
-//        }
-//
-//        return new UserLibraryDto(subscribers, subscriptions);
-//    }
-
     public void updateUser (String username, UserUpdateDto user) {
+        //Todo: create enum 'playlist name' (history, liked, uploads)
         var userToUpdate = userRepository.findByUsername(username);
 
         if (!userToUpdate.getAvatar().equals(user.getAvatar().getOriginalFilename())) {
@@ -249,18 +200,30 @@ public class UserService {
 
         userRepository.save(userToUpdate);
         userElasticSearchService.update(username, userToUpdate);
-//        userElasticSearchService.save(new com.network.social_network.mapping.User(
-//                userToUpdate.getUsername(),
-//                userToUpdate.getFirstName(),
-//                userToUpdate.getLastName(),
-//                userToUpdate.getSubscriptions().size(),
-//                userToUpdate.getSubscribers().size(),
-//                userToUpdate.getPlaylists().get(0).getSongs().size(),
-//                userToUpdate.getAvatar()
-//        ));
     }
 
     public void delete (String username) {
         userRepository.deleteByUsername(username);
+    }
+
+    public List<UserProfileDto> getAll() {
+        var usersProfiles = new ArrayList<UserProfileDto>();
+
+        for (var user : userRepository.findAll()) {
+            usersProfiles.add(new UserProfileDto(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getSubscriptions(),
+                    user.getSubscribers(),
+                    user.getPlaylists().get(0).getSongs().size(),
+                    user.getEmail(),
+                    user.getAvatar(),
+                    user.getRole()
+            ));
+        }
+
+        return usersProfiles;
     }
 }

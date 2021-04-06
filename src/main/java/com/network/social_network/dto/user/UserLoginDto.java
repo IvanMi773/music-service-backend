@@ -1,11 +1,11 @@
 package com.network.social_network.dto.user;
 
-public class UserAuthenticationDto {
+public class UserLoginDto {
 
     private String username;
     private String password;
 
-    public UserAuthenticationDto () {
+    public UserLoginDto() {
     }
 
     public String getUsername () {

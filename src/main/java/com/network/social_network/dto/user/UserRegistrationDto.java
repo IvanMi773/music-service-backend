@@ -1,12 +1,22 @@
 package com.network.social_network.dto.user;
 
-public class UserDto {
+public class UserRegistrationDto {
 
     private String username;
     private String email;
     private String password;
     private String firstName;
     private String lastName;
+    private Integer role;
+
+    public UserRegistrationDto(String username, String email, String password, String firstName, String lastName, Integer role) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.role = role;
+    }
 
     public String getUsername() {
         return username;
@@ -46,5 +56,13 @@ public class UserDto {
 
     public void setLastName (String lastName) {
         this.lastName = lastName;
+    }
+
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
     }
 }

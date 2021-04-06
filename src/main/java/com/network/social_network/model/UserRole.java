@@ -3,7 +3,7 @@ package com.network.social_network.model;
 import org.springframework.security.core.GrantedAuthority;
 
 public enum UserRole implements GrantedAuthority {
-    STUDENT("STUDENT"),
+    USER("USER"),
     ADMIN("ADMIN");
 
     private String role;
