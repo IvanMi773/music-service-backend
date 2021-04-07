@@ -3,7 +3,8 @@ package com.network.social_network.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity(name = "playlists")
 public class Playlist {
@@ -19,8 +20,8 @@ public class Playlist {
 
     private String name;
 
-    @ManyToMany(mappedBy = "playlists", cascade = CascadeType.ALL)
-    private List<Song> songs;
+    @ManyToMany(mappedBy = "playlists")
+    private Set<Song> songs = new HashSet<>();
 
     private String photoFile;
 
@@ -60,11 +61,11 @@ public class Playlist {
         this.name = name;
     }
 
-    public List<Song> getSongs () {
+    public Set<Song> getSongs () {
         return songs;
     }
 
-    public void setSongs (List<Song> songs) {
+    public void setSongs (Set<Song> songs) {
         this.songs = songs;
     }
 
@@ -82,5 +83,15 @@ public class Playlist {
 
     public void setState (PlayListState state) {
         this.state = state;
+    }
+
+    public void addSong (Song song) {
+        this.songs.add(song);
+        song.getPlaylists().add(this);
+    }
+
+    public void removeSong (Song song) {
+        this.songs.remove(song);
+        song.getPlaylists().remove(this);
     }
 }

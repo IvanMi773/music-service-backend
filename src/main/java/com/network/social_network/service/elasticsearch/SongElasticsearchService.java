@@ -48,12 +48,13 @@ public class SongElasticsearchService {
             );
             songResponseDtos.add(new SongResponseDto(
                     song.getId(),
-                    song.getPlaylists().get(0).getUser().getUsername(),
+                    song.getPlaylists().iterator().next().getUser().getUsername(),
                     song.getName(),
                     song.getGenre().getName(),
                     song.getSongFile().getFileName(),
                     song.getSongFile().getDuration(),
-                    song.getLikes()
+                    song.getLikes(),
+                    song.getCover()
             ));
         }
 

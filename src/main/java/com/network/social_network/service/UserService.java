@@ -91,9 +91,9 @@ public class UserService {
                     user.getUsername()
             ));
 
-            var uploadsPlaylist = new Playlist(user, "Uploads", "default.png", PlayListState.PRIVATE);
-            var likedPlaylist = new Playlist(user, "Liked", "liked.png", PlayListState.PRIVATE);
-            var historyPlaylist = new Playlist(user, "History", "default.png", PlayListState.PRIVATE);
+            var uploadsPlaylist = new Playlist(user, "Uploads", "default.png", PlayListState.TECHNICAL);
+            var likedPlaylist = new Playlist(user, "Liked", "liked.png", PlayListState.TECHNICAL);
+            var historyPlaylist = new Playlist(user, "History", "default.png", PlayListState.TECHNICAL);
 
             playlistRepository.save(uploadsPlaylist);
             playlistRepository.save(likedPlaylist);

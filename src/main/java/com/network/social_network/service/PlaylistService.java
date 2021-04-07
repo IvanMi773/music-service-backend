@@ -43,7 +43,8 @@ public class PlaylistService {
                         s.getGenre().getName(),
                         s.getSongFile().getFileName(),
                         s.getSongFile().getDuration(),
-                        s.getLikes()
+                        s.getLikes(),
+                        s.getCover()
                 ));
             }
 
@@ -52,7 +53,8 @@ public class PlaylistService {
                     playlist.getName(),
                     playlist.getPhoto(),
                     songs,
-                    playlist.getUser().getUsername()
+                    playlist.getUser().getUsername(),
+                    playlist.getState().name()
             ));
         }
         return playlistResponseDtoList;
@@ -72,7 +74,8 @@ public class PlaylistService {
                     s.getGenre().getName(),
                     s.getSongFile().getFileName(),
                     s.getSongFile().getDuration(),
-                    s.getLikes()
+                    s.getLikes(),
+                    s.getCover()
             ));
         }
 
@@ -81,7 +84,8 @@ public class PlaylistService {
                 playlist.getName(),
                 playlist.getPhoto(),
                 songs,
-                playlist.getUser().getUsername()
+                playlist.getUser().getUsername(),
+                playlist.getState().name()
         );
 
         return playlistDto;
@@ -130,7 +134,8 @@ public class PlaylistService {
                  p.getName(),
                  p.getPhoto(),
                  null,
-                 username
+                 username,
+                 p.getState().name()
             ));
         }
 

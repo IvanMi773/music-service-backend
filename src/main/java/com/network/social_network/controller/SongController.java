@@ -61,6 +61,19 @@ public class SongController {
         return new ResponseEntity(inputStreamResource, httpHeaders, HttpStatus.OK);
     }
 
+    @GetMapping("/cover/{title}")
+    public ResponseEntity getCover (@PathVariable String title) throws FileNotFoundException {
+        String file = "uploads/covers/" + title;
+
+        long length = new File(file).length();
+
+        InputStreamResource inputStreamResource = new InputStreamResource( new FileInputStream(file));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentLength(length);
+        httpHeaders.setCacheControl(CacheControl.noCache().getHeaderValue());
+        return new ResponseEntity(inputStreamResource, httpHeaders, HttpStatus.OK);
+    }
+
     @GetMapping("/s")
     public List<SongResponseDto> getSubscriptionsSongs (@AuthenticationPrincipal org.springframework.security.core.userdetails.User userdetails) {
         return songService.getSubscriptionsSongs(userdetails.getUsername());
@@ -71,9 +84,10 @@ public class SongController {
             @AuthenticationPrincipal User user,
             @RequestParam("title") String name,
             @RequestParam("file") MultipartFile file,
+            @RequestParam("cover") MultipartFile cover,
             @RequestParam("genre") Long genreId
-    ) {
-        var songDto = new SongRequestDto(user.getUsername(), name, file, genreId);
+            ) {
+        var songDto = new SongRequestDto(user.getUsername(), name, file, cover, genreId);
         songService.createSong(songDto);
 
         HashMap<String, String> response = new HashMap<>();
@@ -89,18 +103,12 @@ public class SongController {
         return HttpStatus.OK;
     }
 
-    @PostMapping("/h/{songId}")
-    public HttpStatus saveSongToHistory (@PathVariable Long songId, @AuthenticationPrincipal User user) {
-        //TODO: remove "save to history", and replace it to "save song to playlist"
-        songService.saveSongToHistory(songId, user.getUsername());
+    @PostMapping("/{songId}/p/{playlistId}")
+    public HttpStatus saveSongToHistory (@PathVariable Long songId, @PathVariable Long playlistId) {
+        songService.saveSongToPlaylist(songId, playlistId);
 
         return HttpStatus.OK;
     }
-
-//    @GetMapping("/likes/{songId}/{username}")
-//    public SongLikesDto getLikesOfSong (@PathVariable Long songId, @PathVariable String username) {
-//        return songService.getLikesOfSong(songId, username);
-//    }
 
     @PutMapping("/updateLikes/{songId}")
     public SongResponseDto updateLikesOfSong (@PathVariable Long songId, @RequestBody String username) {
@@ -108,7 +116,7 @@ public class SongController {
     }
 
     @DeleteMapping("/{songId}")
-    public HttpStatus deletePost (@PathVariable Long songId) {
+    public HttpStatus deleteSong (@PathVariable Long songId) {
         songService.deleteSongById(songId);
 
         return HttpStatus.OK;

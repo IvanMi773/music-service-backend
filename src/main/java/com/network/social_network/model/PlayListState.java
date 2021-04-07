@@ -3,7 +3,8 @@ package com.network.social_network.model;
 public enum PlayListState {
 
     PRIVATE("PRIVATE"),
-    PUBLIC("PUBLIC");
+    PUBLIC("PUBLIC"),
+    TECHNICAL("TECHNICAL");
 
     private String state;
 

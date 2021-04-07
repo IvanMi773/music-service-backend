@@ -22,19 +22,22 @@ public class SongService {
     private final GenreRepository genreRepository;
     private final FileUploadService fileUploadService;
     private final SongElasticsearchService songElasticsearchService;
+    private final PlaylistRepository playlistRepository;
 
     public SongService(
             SongRepository songRepository,
             UserRepository userRepository,
             GenreRepository genreRepository,
             FileUploadService fileUploadService,
-            SongElasticsearchService songElasticsearchService
+            SongElasticsearchService songElasticsearchService,
+            PlaylistRepository playlistRepository
     ) {
         this.songRepository = songRepository;
         this.userRepository = userRepository;
         this.genreRepository = genreRepository;
         this.fileUploadService = fileUploadService;
         this.songElasticsearchService = songElasticsearchService;
+        this.playlistRepository = playlistRepository;
     }
 
     public ArrayList<SongResponseDto> getAll () {
@@ -58,7 +61,8 @@ public class SongService {
                         song.getGenre().getName(),
                         song.getSongFile().getFileName(),
                         song.getSongFile().getDuration(),
-                        song.getLikes()
+                        song.getLikes(),
+                        song.getCover()
                 );
                 songs.add(songDto);
             }
@@ -81,8 +85,8 @@ public class SongService {
                             song.getGenre().getName(),
                             song.getSongFile().getFileName(),
                             song.getSongFile().getDuration(),
-                            song.getLikes()
-                    )
+                            song.getLikes(),
+                            song.getCover())
             );
         }
 
@@ -91,12 +95,15 @@ public class SongService {
 
     public void createSong (SongRequestDto songRequestDto) {
         var songFile = fileUploadService.saveSong(songRequestDto.getSong());
+        var coverFile = fileUploadService.saveSongCover(songRequestDto.getCover());
         var user = userRepository.findByUsername(songRequestDto.getUsername());
 
         var song = new Song(
                 songRequestDto.getName(),
                 songFile,
-                genreRepository.findById(songRequestDto.getGenre()).orElseThrow(() -> new CustomException("Genre not found", HttpStatus.NOT_FOUND))
+                genreRepository.findById(songRequestDto.getGenre()).orElseThrow(() -> new CustomException("Genre not found", HttpStatus.NOT_FOUND)),
+                coverFile,
+                false
         );
         song.addPlaylist(user.getPlaylists().get(0));
 
@@ -124,7 +131,12 @@ public class SongService {
     }
 
     public void deleteSongById (Long songId) {
-        songRepository.deleteById(songId);
+        var song = songRepository.findById(songId).orElseThrow(
+                () -> new CustomException("Song not found", HttpStatus.NOT_FOUND)
+        );
+
+        song.setDeleted(true);
+        songRepository.save(song);
     }
 
     public SongResponseDto updateLikesOfSong (Long songId, String username) {
@@ -136,7 +148,7 @@ public class SongService {
 
         if (song.getLikes().contains(user)) {
             song.getLikes().remove(user);
-            song.removeFromPlaylist(user.getPlaylists().get(1));
+            song.removePlaylist(user.getPlaylists().get(1));
         } else {
             song.getLikes().add(user);
             song.addPlaylist(user.getPlaylists().get(1));
@@ -151,19 +163,10 @@ public class SongService {
                 song.getGenre().getName(),
                 song.getSongFile().getFileName(),
                 song.getSongFile().getDuration(),
-                song.getLikes()
+                song.getLikes(),
+                song.getCover()
         );
     }
-
-//    public SongLikesDto getLikesOfSong (Long songId, String username) {
-//        var song = songRepository.findById(songId).orElseThrow(
-//                () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
-//        );
-//
-//        var user = userRepository.findByUsername(username);
-//
-//        return new SongLikesDto(song.getId(), (long) song.getLikes().size(), song.getLikes().contains(user));
-//    }
 
     public List<SongResponseDto> getSubscriptionsSongs (String username) {
 
@@ -179,7 +182,9 @@ public class SongService {
                         s.getGenre().getName(),
                         s.getSongFile().getFileName(),
                         s.getSongFile().getDuration(),
-                        s.getLikes())
+                        s.getLikes(),
+                                s.getCover()
+                        )
                 );
             }
         }
@@ -187,10 +192,16 @@ public class SongService {
         return songs;
     }
 
-    public void saveSongToHistory (Long songId, String username) {
-        var user = userRepository.findByUsername(username);
-        var song = songRepository.findById(songId).orElseThrow(() -> new CustomException("Song not found", HttpStatus.NOT_FOUND));
-        song.addPlaylist(user.getPlaylists().get(2)); // History playlist
+    public void saveSongToPlaylist (Long songId, Long playlistId) {
+//        var user = userRepository.findByUsername(username);
+        var playlist = playlistRepository.findById(playlistId).orElseThrow(
+                () -> new CustomException("Playlist not found", HttpStatus.NOT_FOUND)
+        );
+
+        var song = songRepository.findById(songId).orElseThrow(
+                () -> new CustomException("Song not found", HttpStatus.NOT_FOUND)
+        );
+        song.addPlaylist(playlist);
         songRepository.save(song);
     }
 }

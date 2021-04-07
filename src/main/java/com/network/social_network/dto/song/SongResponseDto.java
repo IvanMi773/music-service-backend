@@ -13,6 +13,7 @@ public class SongResponseDto {
     private String file;
     private Integer duration;
     private Set<User> likes;
+    private String cover;
 
     public SongResponseDto(
             Long id,
@@ -21,7 +22,8 @@ public class SongResponseDto {
             String genre,
             String file,
             Integer duration,
-            Set<User> likes
+            Set<User> likes,
+            String cover
     ) {
         this.id = id;
         this.username = username;
@@ -30,6 +32,7 @@ public class SongResponseDto {
         this.file = file;
         this.duration = duration;
         this.likes = likes;
+        this.cover = cover;
     }
 
     public SongResponseDto () {
@@ -85,5 +88,13 @@ public class SongResponseDto {
 
     public void setLikes(Set<User> likes) {
         this.likes = likes;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 }

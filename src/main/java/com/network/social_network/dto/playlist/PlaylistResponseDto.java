@@ -11,19 +11,22 @@ public class PlaylistResponseDto {
     private String photo;
     private List<SongResponseDto> songs;
     private String username;
+    private String state;
 
     public PlaylistResponseDto(
             Long id,
             String title,
             String photo,
             List<SongResponseDto> songs,
-            String username
+            String username,
+            String state
     ) {
         this.id = id;
         this.title = title;
         this.photo = photo;
         this.songs = songs;
         this.username = username;
+        this.state = state;
     }
 
     public List<SongResponseDto> getSongs () {
@@ -64,5 +67,13 @@ public class PlaylistResponseDto {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }

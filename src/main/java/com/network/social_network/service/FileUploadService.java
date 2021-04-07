@@ -25,6 +25,7 @@ public class FileUploadService {
 
     private final Path playlistPhotos = Paths.get("uploads/playlist_photos");
     private final Path userAvatars = Paths.get("uploads/avatars");
+    private final Path songCover = Paths.get("uploads/covers");
 
     private final Path songs = Paths.get("uploads/songs");
     private final String fileExpansion = ".mp3";
@@ -39,6 +40,10 @@ public class FileUploadService {
 
     public String saveAvatars (MultipartFile file) {
         return savePhoto(file, userAvatars);
+    }
+
+    public String saveSongCover (MultipartFile file) {
+        return savePhoto(file, songCover);
     }
 
     public String savePhoto (MultipartFile file, Path root) {

@@ -1,6 +1,8 @@
 package com.network.social_network.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Where;
+import org.springframework.boot.context.properties.bind.Name;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity(name = "songs")
+@Where(clause = "is_deleted=0")
 public class Song {
 
     @Id
@@ -16,13 +19,13 @@ public class Song {
     private Long id;
 
     @JsonIgnore
-    @ManyToMany(cascade = { CascadeType.ALL })
+    @ManyToMany
     @JoinTable(
             name = "playlist_song",
             joinColumns = { @JoinColumn(name = "song_id") },
             inverseJoinColumns = { @JoinColumn(name = "playlist_id") }
     )
-    private List<Playlist> playlists;
+    private Set<Playlist> playlists;
 
     @OneToMany(mappedBy = "song")
     private List<Comment> comments;
@@ -36,7 +39,9 @@ public class Song {
     @ManyToOne
     private Genre genre;
 
-    @ManyToMany
+    private String cover;
+
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "song_likes",
             joinColumns = { @JoinColumn(name = "id") },
@@ -44,14 +49,21 @@ public class Song {
     )
     private Set<User> likes = new HashSet<>();
 
-    public Song (
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
+    public Song(
             String name,
             SongFile file,
-            Genre genre
+            Genre genre,
+            String cover,
+            Boolean isDeleted
     ) {
         this.name = name;
         this.file = file;
-        playlists = new ArrayList<>();
+        this.cover = cover;
+        this.isDeleted = isDeleted;
+        playlists = new HashSet<>();
 
         if (genre != null) {
             this.genre = genre;
@@ -98,19 +110,37 @@ public class Song {
         this.likes = likes;
     }
 
-    public List<Playlist> getPlaylists () {
+    public Set<Playlist> getPlaylists () {
         return playlists;
     }
 
-    public void setPlaylists (List<Playlist> playlists) {
+    public void setPlaylists (Set<Playlist> playlists) {
         this.playlists = playlists;
     }
 
     public void addPlaylist (Playlist playlist) {
         this.playlists.add(playlist);
+        playlist.getSongs().add(this);
     }
 
-    public void removeFromPlaylist (Playlist playlist) {
+    public void removePlaylist (Playlist playlist) {
         this.playlists.remove(playlist);
+        playlist.getSongs().remove(this);
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 }
