@@ -92,6 +92,10 @@ public class PlaylistService {
     }
 
     public void deletePlaylistById (Long playlistId) {
+        var playlist = playlistRepository.findById(playlistId).orElseThrow();
+        for (var song : playlist.getSongs()) {
+            song.removePlaylist(playlist);
+        }
         playlistRepository.deleteById(playlistId);
     }
 

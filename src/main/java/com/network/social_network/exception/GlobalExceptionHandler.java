@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@RestControllerAdvice
-public class GlobalExceptionHandler  {
+//@RestControllerAdvice
+//public class GlobalExceptionHandler  {
     //Todo: correct exception handling
 //    @ExceptionHandler(CustomException.class)
 //    public ResponseEntity<Object> handleCustomException(CustomException ex) {
@@ -27,4 +27,4 @@ public class GlobalExceptionHandler  {
 //        res.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Something went wrong");
 //    }
 
-}
+//}
