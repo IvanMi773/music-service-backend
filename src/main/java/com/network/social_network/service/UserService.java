@@ -1,17 +1,14 @@
 package com.network.social_network.service;
 
 import com.network.social_network.dto.user.UserRegistrationDto;
-//import com.network.social_network.dto.user.UserLibraryDto;
 import com.network.social_network.dto.user.UserProfileDto;
 import com.network.social_network.dto.user.UserUpdateDto;
 import com.network.social_network.exception.CustomException;
 import com.network.social_network.model.*;
 import com.network.social_network.repository.PlaylistRepository;
 import com.network.social_network.repository.UserRepository;
-//import com.network.social_network.repository.VerificationTokenRepository;
 import com.network.social_network.security.jwt.JwtTokenProvider;
 import com.network.social_network.service.elasticsearch.UserElasticSearchService;
-import com.network.social_network.service.mail.MailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,10 +31,9 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-//    private final VerificationTokenRepository verificationTokenRepository;
-    private final MailService mailService;
     private final FileUploadService fileUploadService;
     private final UserElasticSearchService userElasticSearchService;
+    private final PlaylistService playlistService;
 
     public UserService(
             UserRepository userRepository,
@@ -45,17 +41,18 @@ public class UserService {
             JwtTokenProvider jwtTokenProvider,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
-            MailService mailService,
-            FileUploadService fileUploadService, UserElasticSearchService userElasticSearchService) {
+            FileUploadService fileUploadService,
+            UserElasticSearchService userElasticSearchService,
+            PlaylistService playlistService
+    ) {
         this.userRepository = userRepository;
         this.playlistRepository = playlistRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
-//        this.verificationTokenRepository = verificationTokenRepository;
-        this.mailService = mailService;
         this.fileUploadService = fileUploadService;
         this.userElasticSearchService = userElasticSearchService;
+        this.playlistService = playlistService;
     }
 
     public String login(String username, String password) {
@@ -82,6 +79,7 @@ public class UserService {
                     null,
                     userRegistrationDto.getRole() == 0 ? UserRole.ADMIN.getRole() : UserRole.USER.getRole(),
                     false,
+                    false,
                     false
             );
             userRepository.save(user);
@@ -91,53 +89,19 @@ public class UserService {
                     user.getUsername()
             ));
 
-            var uploadsPlaylist = new Playlist(user, "Uploads", "default.png", PlayListState.TECHNICAL);
-            var likedPlaylist = new Playlist(user, "Liked", "liked.png", PlayListState.TECHNICAL);
-            var historyPlaylist = new Playlist(user, "History", "default.png", PlayListState.TECHNICAL);
+            var uploadsPlaylist = new Playlist(user, "Uploads", "default.png", PlayListState.TECHNICAL, false);
+            var likedPlaylist = new Playlist(user, "Liked", "liked.png", PlayListState.TECHNICAL, false);
+            var historyPlaylist = new Playlist(user, "History", "default.png", PlayListState.TECHNICAL, false);
 
             playlistRepository.save(uploadsPlaylist);
             playlistRepository.save(likedPlaylist);
             playlistRepository.save(historyPlaylist);
 
-//            String token = generateVerificationToken(user);
-//            mailService.sendMail(new VerificationMail(
-//                    "Please activate your account",
-//                    user.getEmail(),
-//                    "localhost:8080/api/auth/verify/" + token
-//            ));
-
             return jwtTokenProvider.generateToken(user.getUsername(), user.getRole());
         } else {
-            throw new CustomException("Username or email is already use", HttpStatus.BAD_REQUEST);
+            throw new CustomException("Username or email is already in use", HttpStatus.BAD_REQUEST);
         }
     }
-
-//    private String generateVerificationToken (User user) {
-//        String token = UUID.randomUUID().toString();
-//
-//        VerificationToken verificationToken = new VerificationToken(
-//                token,
-//                user,
-//                Instant.now().plusSeconds(10800) // 3 hours
-//        );
-//
-//        verificationTokenRepository.save(verificationToken);
-//
-//        return token;
-//    }
-
-//    public void verifyAccount (String token) {
-//        //Todo: check if token expire
-//        VerificationToken verificationToken = verificationTokenRepository.findByToken(token).get();
-//
-//        String username = verificationToken.getUser().getUsername();
-//        User user = userRepository.findByUsername(username);
-//        user.setIsEnabled(true);
-//        user.setEnabled_at(Instant.now());
-//        userRepository.save(user);
-//
-//        verificationTokenRepository.deleteById(verificationToken.getId());
-//    }
 
     public UserProfileDto changeSubscription (User channel, User subscriber) {
 
@@ -203,7 +167,14 @@ public class UserService {
     }
 
     public void delete (String username) {
-        userRepository.deleteByUsername(username);
+        var user = userRepository.findByUsername(username);
+        for (var playlist: user.getPlaylists()) {
+            playlistService.deletePlaylistById(playlist.getId());
+        }
+        user.setDeleted(true);
+        userRepository.save(user);
+        userElasticSearchService.removeAll();
+        userElasticSearchService.saveAll(userRepository.findAll());
     }
 
     public List<UserProfileDto> getAll() {

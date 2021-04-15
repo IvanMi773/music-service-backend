@@ -9,6 +9,4 @@ import java.util.List;
 
 public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
 
-//    @Query("SELECT * FROM Playlist p WHERE p.state = PUBLIC")
-//    List<Playlist> findAllPublic();
 }

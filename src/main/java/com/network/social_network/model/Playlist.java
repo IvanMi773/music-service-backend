@@ -1,12 +1,14 @@
 package com.network.social_network.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity(name = "playlists")
+@Where(clause = "is_deleted=0")
 public class Playlist {
 
     @Id
@@ -27,16 +29,21 @@ public class Playlist {
 
     private PlayListState state;
 
-    public Playlist (
+    @Column(name = "is_deleted")
+    private boolean isDeleted;
+
+    public Playlist(
             User user,
             String name,
             String photoFile,
-            PlayListState state
+            PlayListState state,
+            boolean isDeleted
     ) {
         this.user = user;
         this.name = name;
         this.photoFile = photoFile;
         this.state = state;
+        this.isDeleted = isDeleted;
     }
 
     public Playlist () {}
@@ -93,5 +100,13 @@ public class Playlist {
     public void removeSong (Song song) {
         this.songs.remove(song);
         song.getPlaylists().remove(this);
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }

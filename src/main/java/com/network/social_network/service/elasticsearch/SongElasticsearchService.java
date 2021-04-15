@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -54,9 +55,12 @@ public class SongElasticsearchService {
                     song.getSongFile().getFileName(),
                     song.getSongFile().getDuration(),
                     song.getLikes(),
-                    song.getCover()
+                    song.getCover(),
+                    song.getCreatedAt()
             ));
         }
+
+        songResponseDtos.sort(Collections.reverseOrder());
 
         return songResponseDtos;
     }

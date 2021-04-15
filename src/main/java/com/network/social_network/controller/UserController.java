@@ -14,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,16 +69,20 @@ public class UserController {
     }
 
     @GetMapping("/avatar/{avatar}")
-    public ResponseEntity getAvatar (@PathVariable String avatar) throws FileNotFoundException {
-        String file = "uploads/avatars/" + avatar;
+    public ResponseEntity getAvatar (@PathVariable String avatar) {
+        try {
+            String file = "uploads/avatars/" + avatar;
 
-        long length = new File(file).length();
+            long length = new File(file).length();
 
-        InputStreamResource inputStreamResource = new InputStreamResource( new FileInputStream(file));
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentLength(length);
-        httpHeaders.setCacheControl(CacheControl.noCache().getHeaderValue());
-        return new ResponseEntity(inputStreamResource, httpHeaders, HttpStatus.OK);
+            InputStreamResource inputStreamResource = new InputStreamResource(new FileInputStream(file));
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setContentLength(length);
+            httpHeaders.setCacheControl(CacheControl.noCache().getHeaderValue());
+            return new ResponseEntity(inputStreamResource, httpHeaders, HttpStatus.OK);
+        } catch (FileNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found", e);
+        }
     }
 
     @DeleteMapping("/{username}")

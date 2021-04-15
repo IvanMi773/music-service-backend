@@ -4,8 +4,7 @@ import com.network.social_network.repository.SongRepository;
 import com.network.social_network.repository.UserRepository;
 import com.network.social_network.service.elasticsearch.SongElasticsearchService;
 import com.network.social_network.service.elasticsearch.UserElasticSearchService;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,12 +39,14 @@ public class SearchController {
     }
 
     @GetMapping("/update")
-    public void update () {
+    public HttpStatus update () {
         songElasticsearchService.removeAll();
         songElasticsearchService.saveAll(songRepository.findAll());
 
         userElasticSearchService.removeAll();
         userElasticSearchService.saveAll(userRepository.findAll());
+
+        return HttpStatus.OK;
     }
 }
 

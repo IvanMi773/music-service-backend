@@ -8,6 +8,7 @@ import com.network.social_network.model.PlayListState;
 import com.network.social_network.model.Playlist;
 import com.network.social_network.model.Song;
 import com.network.social_network.repository.PlaylistRepository;
+import com.network.social_network.repository.SongRepository;
 import com.network.social_network.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,14 +21,18 @@ public class PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
+    private final SongRepository songRepository;
 
-    public PlaylistService (
+    public PlaylistService(
             PlaylistRepository playlistRepository,
             UserRepository userRepository,
-            FileUploadService fileUploadService) {
+            FileUploadService fileUploadService,
+            SongRepository songRepository
+    ) {
         this.playlistRepository = playlistRepository;
         this.userRepository = userRepository;
         this.fileUploadService = fileUploadService;
+        this.songRepository = songRepository;
     }
 
     public List<PlaylistResponseDto> getAll () {
@@ -44,7 +49,8 @@ public class PlaylistService {
                         s.getSongFile().getFileName(),
                         s.getSongFile().getDuration(),
                         s.getLikes(),
-                        s.getCover()
+                        s.getCover(),
+                        s.getCreatedAt()
                 ));
             }
 
@@ -75,7 +81,8 @@ public class PlaylistService {
                     s.getSongFile().getFileName(),
                     s.getSongFile().getDuration(),
                     s.getLikes(),
-                    s.getCover()
+                    s.getCover(),
+                    s.getCreatedAt()
             ));
         }
 
@@ -92,11 +99,11 @@ public class PlaylistService {
     }
 
     public void deletePlaylistById (Long playlistId) {
-        var playlist = playlistRepository.findById(playlistId).orElseThrow();
-        for (var song : playlist.getSongs()) {
-            song.removePlaylist(playlist);
-        }
-        playlistRepository.deleteById(playlistId);
+        var playlist = playlistRepository.findById(playlistId).orElseThrow(
+                () -> new CustomException("Playlist with id " + playlistId + " not found", HttpStatus.NOT_FOUND)
+        );
+        playlist.setDeleted(true);
+        playlistRepository.save(playlist);
     }
 
     public void createPlaylist (String username, PlaylistDto playlistDto) {
@@ -108,8 +115,8 @@ public class PlaylistService {
                 userRepository.findByUsername(username),
                 playlistDto.getName(),
                 photoFile,
-                playlistDto.getState() == 0 ? PlayListState.PRIVATE : PlayListState.PUBLIC
-        );
+                playlistDto.getState() == 0 ? PlayListState.PRIVATE : PlayListState.PUBLIC,
+                false);
 
         playlistRepository.save(playlist);
     }

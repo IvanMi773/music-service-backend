@@ -56,7 +56,7 @@ public class FileUploadService {
 
             File image = new File(path);
             BufferedImage bufferedImage = ImageIO.read(image);
-            var croppedImage = cropImage(bufferedImage, 0, 0, 600, 600);
+            var croppedImage = cropImage(bufferedImage, 0, 0, 1000, 1000);
             File pathFile = new File(path);
             ImageIO.write(croppedImage,"jpg", pathFile);
 

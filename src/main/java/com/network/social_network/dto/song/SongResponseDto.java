@@ -2,9 +2,10 @@ package com.network.social_network.dto.song;
 
 import com.network.social_network.model.User;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
-public class SongResponseDto {
+public class SongResponseDto implements Comparable<SongResponseDto> {
 
     private Long id;
     private String username;
@@ -14,6 +15,7 @@ public class SongResponseDto {
     private Integer duration;
     private Set<User> likes;
     private String cover;
+    private LocalDateTime createdAt;
 
     public SongResponseDto(
             Long id,
@@ -23,7 +25,8 @@ public class SongResponseDto {
             String file,
             Integer duration,
             Set<User> likes,
-            String cover
+            String cover,
+            LocalDateTime createdAt
     ) {
         this.id = id;
         this.username = username;
@@ -33,6 +36,7 @@ public class SongResponseDto {
         this.duration = duration;
         this.likes = likes;
         this.cover = cover;
+        this.createdAt = createdAt;
     }
 
     public SongResponseDto () {
@@ -96,5 +100,18 @@ public class SongResponseDto {
 
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Override
+    public int compareTo(SongResponseDto o) {
+        return getCreatedAt().compareTo(o.getCreatedAt());
     }
 }

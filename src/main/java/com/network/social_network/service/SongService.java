@@ -11,7 +11,9 @@ import com.network.social_network.service.elasticsearch.SongElasticsearchService
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -62,11 +64,14 @@ public class SongService {
                         song.getSongFile().getFileName(),
                         song.getSongFile().getDuration(),
                         song.getLikes(),
-                        song.getCover()
+                        song.getCover(),
+                        song.getCreatedAt()
                 );
                 songs.add(songDto);
             }
         }
+
+        songs.sort(Collections.reverseOrder());
 
         return songs;
     }
@@ -86,9 +91,13 @@ public class SongService {
                             song.getSongFile().getFileName(),
                             song.getSongFile().getDuration(),
                             song.getLikes(),
-                            song.getCover())
+                            song.getCover(),
+                            song.getCreatedAt()
+                    )
             );
         }
+
+        songs.sort(Collections.reverseOrder());
 
         return songs;
     }
@@ -103,7 +112,8 @@ public class SongService {
                 songFile,
                 genreRepository.findById(songRequestDto.getGenre()).orElseThrow(() -> new CustomException("Genre not found", HttpStatus.NOT_FOUND)),
                 coverFile,
-                false
+                false,
+                LocalDateTime.now()
         );
         song.addPlaylist(user.getPlaylists().get(0));
 
@@ -122,11 +132,6 @@ public class SongService {
                 () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
         );
 
-//        song.setName(songDto.getName());
-//        song.setSong(songDto.getSong());
-//        song.setGenre(genreRepository.findById(songDto.getGenre()).orElseThrow(() -> new CustomException("Genre not found", HttpStatus.NOT_FOUND)));
-//        song.setLikes(songDto.getLikes());
-
         songRepository.save(song);
     }
 
@@ -137,6 +142,8 @@ public class SongService {
 
         song.setDeleted(true);
         songRepository.save(song);
+        songElasticsearchService.removeAll();
+        songElasticsearchService.saveAll(songRepository.findAll());
     }
 
     public SongResponseDto updateLikesOfSong (Long songId, String username) {
@@ -164,7 +171,8 @@ public class SongService {
                 song.getSongFile().getFileName(),
                 song.getSongFile().getDuration(),
                 song.getLikes(),
-                song.getCover()
+                song.getCover(),
+                song.getCreatedAt()
         );
     }
 
@@ -183,17 +191,19 @@ public class SongService {
                         s.getSongFile().getFileName(),
                         s.getSongFile().getDuration(),
                         s.getLikes(),
-                                s.getCover()
-                        )
+                        s.getCover(),
+                        s.getCreatedAt()
+                    )
                 );
             }
         }
+
+        songs.sort(Collections.reverseOrder());
 
         return songs;
     }
 
     public void saveSongToPlaylist (Long songId, Long playlistId) {
-//        var user = userRepository.findByUsername(username);
         var playlist = playlistRepository.findById(playlistId).orElseThrow(
                 () -> new CustomException("Playlist not found", HttpStatus.NOT_FOUND)
         );

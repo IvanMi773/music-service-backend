@@ -2,13 +2,10 @@ package com.network.social_network.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Where;
-import org.springframework.boot.context.properties.bind.Name;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Entity(name = "songs")
 @Where(clause = "is_deleted=0")
@@ -52,17 +49,21 @@ public class Song {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
+    private LocalDateTime createdAt;
+
     public Song(
             String name,
             SongFile file,
             Genre genre,
             String cover,
-            Boolean isDeleted
+            Boolean isDeleted,
+            LocalDateTime createdAt
     ) {
         this.name = name;
         this.file = file;
         this.cover = cover;
         this.isDeleted = isDeleted;
+        this.createdAt = createdAt;
         playlists = new HashSet<>();
 
         if (genre != null) {
@@ -142,5 +143,13 @@ public class Song {
 
     public void setDeleted(Boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

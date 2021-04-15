@@ -1,18 +1,19 @@
 package com.network.social_network.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity(name = "users")
+@Where(clause = "is_deleted=0")
 public class User {
 
     @Id
@@ -72,7 +73,10 @@ public class User {
     private boolean isBlocked;
     private boolean isEnabled;
 
-    public User (
+    @Column(name = "is_deleted")
+    private boolean isDeleted;
+
+    public User(
             String email,
             String username,
             String password,
@@ -83,7 +87,8 @@ public class User {
             Instant enabled_at,
             String role,
             boolean isBlocked,
-            boolean isEnabled
+            boolean isEnabled,
+            boolean isDeleted
     ) {
         this.email = email;
         this.username = username;
@@ -96,6 +101,7 @@ public class User {
         this.role = role;
         this.isBlocked = isBlocked;
         this.isEnabled = isEnabled;
+        this.isDeleted = isDeleted;
     }
 
     public User() {
@@ -243,5 +249,13 @@ public class User {
 
     public void setAvatar (String avatar) {
         this.avatar = avatar;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }
