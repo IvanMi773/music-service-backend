@@ -49,7 +49,7 @@ public class SongElasticsearchService {
             );
             songResponseDtos.add(new SongResponseDto(
                     song.getId(),
-                    song.getPlaylists().iterator().next().getUser().getUsername(),
+                    song.getUser().getUsername(),
                     song.getName(),
                     song.getGenre().getName(),
                     song.getSongFile().getFileName(),

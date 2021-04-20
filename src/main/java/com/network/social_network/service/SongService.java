@@ -108,6 +108,7 @@ public class SongService {
         var user = userRepository.findByUsername(songRequestDto.getUsername());
 
         var song = new Song(
+                user,
                 songRequestDto.getName(),
                 songFile,
                 genreRepository.findById(songRequestDto.getGenre()).orElseThrow(() -> new CustomException("Genre not found", HttpStatus.NOT_FOUND)),
@@ -213,5 +214,33 @@ public class SongService {
         );
         song.addPlaylist(playlist);
         songRepository.save(song);
+    }
+
+    public List<SongResponseDto> getSongsByGenreName(String genreName) {
+
+        var genre = genreRepository.getGenreByName(genreName);
+        if (genre == null) {
+            throw new CustomException("Genre with name " + genreName + " not found", HttpStatus.NOT_FOUND);
+        }
+        var songs = songRepository.getSongsByGenreId(genre.getId());
+        var response = new ArrayList<SongResponseDto>();
+
+        for (Song s : songs) {
+            response.add(new SongResponseDto(
+                    s.getId(),
+                    s.getUser().getUsername(),
+                    s.getName(),
+                    s.getGenre().getName(),
+                    s.getSongFile().getFileName(),
+                    s.getSongFile().getDuration(),
+                    s.getLikes(),
+                    s.getCover(),
+                    s.getCreatedAt()
+                )
+            );
+        }
+
+        response.sort(Collections.reverseOrder());
+        return response;
     }
 }

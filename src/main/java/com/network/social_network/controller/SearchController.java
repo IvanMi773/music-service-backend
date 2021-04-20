@@ -2,6 +2,7 @@ package com.network.social_network.controller;
 
 import com.network.social_network.repository.SongRepository;
 import com.network.social_network.repository.UserRepository;
+import com.network.social_network.service.SongService;
 import com.network.social_network.service.elasticsearch.SongElasticsearchService;
 import com.network.social_network.service.elasticsearch.UserElasticSearchService;
 import org.springframework.http.HttpStatus;
@@ -20,12 +21,20 @@ public class SearchController {
     private final UserElasticSearchService userElasticSearchService;
     private final SongRepository songRepository;
     private final UserRepository userRepository;
+    private final SongService songService;
 
-    public SearchController(SongElasticsearchService songElasticsearchService, UserElasticSearchService userElasticSearchService, SongRepository songRepository, UserRepository userRepository) {
+    public SearchController(
+            SongElasticsearchService songElasticsearchService,
+            UserElasticSearchService userElasticSearchService,
+            SongRepository songRepository,
+            UserRepository userRepository,
+            SongService songService
+    ) {
         this.songElasticsearchService = songElasticsearchService;
         this.userElasticSearchService = userElasticSearchService;
         this.songRepository = songRepository;
         this.userRepository = userRepository;
+        this.songService = songService;
     }
 
     @GetMapping("/{searchQuery}")
@@ -34,6 +43,7 @@ public class SearchController {
 
         response.put("songs", songElasticsearchService.findByName(searchQuery));
         response.put("users", userElasticSearchService.findByUsername(searchQuery));
+        response.put("genres", songService.getSongsByGenreName(searchQuery));
 
         return response;
     }

@@ -81,10 +81,9 @@ public class FileUploadService {
             Files.write(Paths.get(path), file.getBytes());
 
             File target = new File("/home/ivan/projects/music_service/music-service-backend/" + path);
-            int duration;
 
             AudioFile audioFile = AudioFileIO.read(target);
-            duration = audioFile.getAudioHeader().getTrackLength();
+            int duration = audioFile.getAudioHeader().getTrackLength();
 
             SongFile model = new SongFile(filename, duration);
             filesRepository.save(model);

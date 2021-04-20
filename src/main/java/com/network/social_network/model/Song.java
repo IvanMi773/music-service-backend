@@ -24,6 +24,11 @@ public class Song {
     )
     private Set<Playlist> playlists;
 
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @OneToMany(mappedBy = "song")
     private List<Comment> comments;
 
@@ -52,6 +57,7 @@ public class Song {
     private LocalDateTime createdAt;
 
     public Song(
+            User user,
             String name,
             SongFile file,
             Genre genre,
@@ -59,6 +65,7 @@ public class Song {
             Boolean isDeleted,
             LocalDateTime createdAt
     ) {
+        this.user = user;
         this.name = name;
         this.file = file;
         this.cover = cover;
@@ -151,5 +158,13 @@ public class Song {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
