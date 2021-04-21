@@ -1,7 +1,7 @@
 package com.network.social_network.service.elasticsearch;
 
 import com.network.social_network.dto.user.UserProfileDto;
-import com.network.social_network.mapping.User;
+import com.network.social_network.elasticsearch_models.User;
 import com.network.social_network.repository.UserRepository;
 import com.network.social_network.repository.elasticsearch.UserElasticSearchRepository;
 import org.springframework.stereotype.Service;

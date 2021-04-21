@@ -120,7 +120,7 @@ public class SongService {
 
         song = songRepository.save(song);
 
-        songElasticsearchService.save(new com.network.social_network.mapping.Song(
+        songElasticsearchService.save(new com.network.social_network.elasticsearch_models.Song(
                 song.getId(),
                 song.getName()
         ));

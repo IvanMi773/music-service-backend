@@ -1,8 +1,8 @@
-package com.network.social_network.security;
+package com.network.social_network.config;
 
 import com.network.social_network.model.UserRole;
-import com.network.social_network.security.jwt.JwtTokenFilterConfigurer;
-import com.network.social_network.security.jwt.JwtTokenProvider;
+import com.network.social_network.jwt.JwtTokenFilterConfigurer;
+import com.network.social_network.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

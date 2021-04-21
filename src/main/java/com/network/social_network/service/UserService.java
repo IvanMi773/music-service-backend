@@ -7,7 +7,7 @@ import com.network.social_network.exception.CustomException;
 import com.network.social_network.model.*;
 import com.network.social_network.repository.PlaylistRepository;
 import com.network.social_network.repository.UserRepository;
-import com.network.social_network.security.jwt.JwtTokenProvider;
+import com.network.social_network.jwt.JwtTokenProvider;
 import com.network.social_network.service.elasticsearch.UserElasticSearchService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -75,16 +74,12 @@ public class UserService {
                     userRegistrationDto.getFirstName(),
                     userRegistrationDto.getLastName(),
                     "default_user.png",
-                    new Date().toInstant(),
-                    null,
                     userRegistrationDto.getRole() == 0 ? UserRole.ADMIN.getRole() : UserRole.USER.getRole(),
-                    false,
-                    false,
                     false
             );
             userRepository.save(user);
 
-            userElasticSearchService.save(new com.network.social_network.mapping.User(
+            userElasticSearchService.save(new com.network.social_network.elasticsearch_models.User(
                     user.getId(),
                     user.getUsername()
             ));

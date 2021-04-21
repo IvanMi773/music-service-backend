@@ -1,4 +1,4 @@
-package com.network.social_network.security;
+package com.network.social_network.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.network.social_network.security.jwt;
+package com.network.social_network.jwt;
 
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

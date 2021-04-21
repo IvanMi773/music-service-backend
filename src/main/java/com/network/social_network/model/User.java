@@ -29,10 +29,6 @@ public class User {
     @JsonIgnore
     private List<Playlist> songs = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<Comment> comments;
-
     @Email
     @NotEmpty(message = "Email is required")
     private String email;
@@ -70,13 +66,7 @@ public class User {
     @JsonIgnore
     private Set<User> subscribers = new HashSet<>();
 
-    private Instant created_at;
-    private Instant enabled_at;
-
     private String role;
-
-    private boolean isBlocked;
-    private boolean isEnabled;
 
     @Column(name = "is_deleted")
     private boolean isDeleted;
@@ -88,11 +78,7 @@ public class User {
             String firstName,
             String lastName,
             String avatar,
-            Instant created_at,
-            Instant enabled_at,
             String role,
-            boolean isBlocked,
-            boolean isEnabled,
             boolean isDeleted
     ) {
         this.email = email;
@@ -101,18 +87,14 @@ public class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.avatar = avatar;
-        this.created_at = created_at;
-        this.enabled_at = enabled_at;
         this.role = role;
-        this.isBlocked = isBlocked;
-        this.isEnabled = isEnabled;
         this.isDeleted = isDeleted;
     }
 
     public User() {
     }
 
-    public Long getUserId() {
+    public Long getId() {
         return id;
     }
 
@@ -156,22 +138,6 @@ public class User {
         this.lastName = lastName;
     }
 
-    public Instant getCreated_at() {
-        return created_at;
-    }
-
-    public void setCreated_at(Instant created_at) {
-        this.created_at = created_at;
-    }
-
-    public Instant getEnabled_at() {
-        return enabled_at;
-    }
-
-    public void setEnabled_at(Instant enabled_at) {
-        this.enabled_at = enabled_at;
-    }
-
     public String getRole () {
         return role;
     }
@@ -180,56 +146,12 @@ public class User {
         this.role = role;
     }
 
-    public boolean getIsBlocked () {
-        return isBlocked;
-    }
-
-    public void setIsBlocked (boolean blocked) {
-        isBlocked = blocked;
-    }
-
-    public boolean getIsEnabled () {
-        return isEnabled;
-    }
-
-    public void setIsEnabled (boolean enabled) {
-        isEnabled = enabled;
-    }
-
-    public List<Comment> getComments () {
-        return comments;
-    }
-
-    public Long getId () {
-        return id;
-    }
-
-    public void setComments (List<Comment> comments) {
-        this.comments = comments;
-    }
-
     public List<Playlist> getPlaylists () {
         return playlists;
     }
 
     public void setPlaylists (List<Playlist> playlists) {
         this.playlists = playlists;
-    }
-
-    public boolean isBlocked () {
-        return isBlocked;
-    }
-
-    public void setBlocked (boolean blocked) {
-        isBlocked = blocked;
-    }
-
-    public boolean isEnabled () {
-        return isEnabled;
-    }
-
-    public void setEnabled (boolean enabled) {
-        isEnabled = enabled;
     }
 
     public Set<User> getSubscriptions () {

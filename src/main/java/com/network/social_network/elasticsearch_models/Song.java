@@ -1,4 +1,4 @@
-package com.network.social_network.mapping;
+package com.network.social_network.elasticsearch_models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;

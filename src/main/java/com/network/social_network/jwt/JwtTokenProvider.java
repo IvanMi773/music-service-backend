@@ -1,7 +1,7 @@
-package com.network.social_network.security.jwt;
+package com.network.social_network.jwt;
 
 import com.network.social_network.exception.CustomException;
-import com.network.social_network.security.OUserDetailsService;
+import com.network.social_network.service.security.OUserDetailsService;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

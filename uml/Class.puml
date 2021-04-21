@@ -1,0 +1,57 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+abstract class AbstractList
+abstract AbstractCollection
+interface List
+interface Collection
+
+List <|-- AbstractList
+Collection <|-- AbstractCollection
+
+Collection <|- List
+AbstractCollection <|- AbstractList
+AbstractList <|-- User
+
+class User {
+    Long id
+    List<Playlist> playlists
+    List<Playlist> songs
+    List<Playlist> comments
+    String email
+    String username
+    String firstName
+    String password
+    String lastName
+    String avatar
+    Set<User> subscriptions
+    Set<User> subscribers
+    String role
+}
+
+class Playlist {
+    Long id
+    User user
+    String name
+    Set<Song> songs
+    String photoFile
+    String state
+}
+
+class Song {
+    Long id
+    User user
+    Set<Playlist> playlists
+    String title
+    String genre
+    String songFile
+    String cover
+    Set<User> likes
+}
+
+class Genre {
+    Long id
+    String name
+}
+
+@enduml

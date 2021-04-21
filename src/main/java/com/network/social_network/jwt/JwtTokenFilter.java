@@ -1,4 +1,4 @@
-package com.network.social_network.security.jwt;
+package com.network.social_network.jwt;
 
 import com.network.social_network.exception.CustomException;
 import org.springframework.security.core.Authentication;

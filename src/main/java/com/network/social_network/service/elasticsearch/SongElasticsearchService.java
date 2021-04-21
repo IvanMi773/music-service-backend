@@ -2,7 +2,7 @@ package com.network.social_network.service.elasticsearch;
 
 import com.network.social_network.dto.song.SongResponseDto;
 import com.network.social_network.exception.CustomException;
-import com.network.social_network.mapping.Song;
+import com.network.social_network.elasticsearch_models.Song;
 import com.network.social_network.repository.SongRepository;
 import com.network.social_network.repository.elasticsearch.SongElasticsearchRepository;
 import org.springframework.http.HttpStatus;
@@ -29,7 +29,7 @@ public class SongElasticsearchService {
 
     public void saveAll (List<com.network.social_network.model.Song> songs) {
         for ( var s : songs) {
-            songElasticsearchRepository.save(new com.network.social_network.mapping.Song(
+            songElasticsearchRepository.save(new com.network.social_network.elasticsearch_models.Song(
                     s.getId(),
                     s.getName()
             ));
