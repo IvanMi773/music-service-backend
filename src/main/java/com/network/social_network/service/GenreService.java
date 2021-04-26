@@ -40,8 +40,4 @@ public class GenreService {
     public List<Genre> getAllGenres () {
         return genreRepository.findAll();
     }
-
-    public void deleteById(Long id) {
-
-    }
 }

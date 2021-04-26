@@ -1,17 +1,19 @@
 @startuml
 'https://plantuml.com/class-diagram
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
+UserService <|-- PlaylistService
+UserService <|-- FileUploadService
+SongService <|-- FileUploadService
+GenreController <|-- GenreService
+UserController <|-- UserService
+AuthController <|-- UserService
+PlaylistController <|-- PlaylistService
+SongController <|-- SongService
 
-List <|-- AbstractList
-Collection <|-- AbstractCollection
-
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- User
+Song <|-- User
+Song <-- Playlist
+Song <|-- Genre
+Playlist <|-- User
 
 class User {
     Long id
@@ -52,6 +54,107 @@ class Song {
 class Genre {
     Long id
     String name
+}
+
+class PlaylistController {
+    PlaylistService playlistService
+
+    HashMap<String, String> createPlaylist (User user, String name, MultipartFile photo, Integer state)
+    HashMap<String, String> updatePlaylist (Long playlistId,PlaylistDto playlistDto)
+    List<PlaylistResponseDto> getPlaylistsByUsername (String username)
+    ResponseEntity getPlaylistPhoto (String title)
+    HttpStatus deletePlaylist (Long playlistId)
+}
+
+class GenreController {
+    GenreService genreService
+
+    HashMap<String, String> createGenre (@RequestBody GenreDto genreDto)
+    List<Genre> getAllGenres ()
+}
+
+class UserController {
+    UserService userService
+
+    List<UserProfileDto> getAllUsers ()
+    UserProfileDto getProfileByUsername (String username)
+    HttpStatus updateUser (User userToUpdate, String firstName, String lastName, String email, MultipartFile avatar)
+    UserProfileDto changeSubscription (User userdetails, String channelName)
+    ResponseEntity getAvatar (@PathVariable String avatar)
+    HttpStatus delete (@PathVariable("username") String username)
+}
+
+class AuthController {
+    UserService userService
+
+    HashMap<String, String> login(UserLoginDto request)
+    HashMap<String, String> register(UserRegistrationDto userRegistrationDto)
+}
+
+class SongController {
+    SongService songService
+
+    ArrayList<SongResponseDto> getAllSongsByUsername (String username)
+    List<SongResponseDto> getSubscriptionsSongs (User user)
+    HashMap<String, String> createSong (User user, String name, MultipartFile file, MultipartFile cover, Long genreId)
+    HttpStatus saveSongToPlaylist (Long songId, Long playlistId)
+    SongResponseDto updateLikesOfSong (Long songId, String username)
+    HttpStatus deleteSong (Long songId)
+}
+
+class GenreService {
+    void create (String name)
+    Genre getGenreByName (String name)
+    Genre getGenreById (Long id)
+    List<Genre> getAllGenres ()
+}
+
+class UserService {
+    FileUploadService fileUploadService
+    PlaylistService playlistService
+
+    String login (String username, String password)
+    String register (User userRegistrationDto)
+    User changeSubscription (User channel, User subscriber)
+    User getUserProfileDtoByUsername (String username)
+    updateUser (String username, User user)
+    delete (String username)
+    List<User> getAll()
+}
+
+class PlaylistService {
+    FileUploadService fileUploadService
+
+    List<PlaylistResponseDto> getAll ()
+    PlaylistResponseDto getPlaylistById (Long playlistId)
+    void deletePlaylistById (Long playlistId)
+    void createPlaylist (String username, PlaylistDto playlistDto)
+    List<PlaylistResponseDto> getPlaylistsByUsername (String username)
+}
+
+class SongService {
+    FileUploadService fileUploadService
+
+    ArrayList<SongResponseDto> getAll ()
+    ArrayList<SongResponseDto> getSongsByUsername (String username)
+    void createSong (SongRequestDto songRequestDto)
+    void deleteSongById (Long songId)
+    SongResponseDto updateLikesOfSong (Long songId, String username)
+    List<SongResponseDto> getSubscriptionsSongs (String username)
+    void saveSongToPlaylist (Long songId, Long playlistId)
+    List<SongResponseDto> getSongsByGenreName(String genreName)
+}
+
+class FileUploadService {
+    String playlistPhotos = "uploads/playlist_photos"
+    String userAvatars = "uploads/avatars"
+    String songCover = "uploads/covers"
+    String songs = "uploads/songs"
+    String fileExpansion = ".mp3"
+
+    String savePhoto (MultipartFile file, Path root)
+    static BufferedImage cropImage (BufferedImage bufferedImage, int x, int y, int width, int height)
+    SongFile saveSong (MultipartFile file)
 }
 
 @enduml

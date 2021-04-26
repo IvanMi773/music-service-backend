@@ -126,16 +126,6 @@ public class SongService {
         ));
     }
 
-    public void updateSong (Long songId, SongRequestDto songRequestDto) {
-        //Todo: correct update
-        //Todo: створювати неіснуючі жанри на бекенді (перевіряти чи жанр існує і якщо ні - створювати)
-        var song = songRepository.findById(songId).orElseThrow(
-                () -> new CustomException("Song with id " + songId + " not found", HttpStatus.NOT_FOUND)
-        );
-
-        songRepository.save(song);
-    }
-
     public void deleteSongById (Long songId) {
         var song = songRepository.findById(songId).orElseThrow(
                 () -> new CustomException("Song not found", HttpStatus.NOT_FOUND)

@@ -68,13 +68,8 @@ public class Song {
         this.cover = cover;
         this.isDeleted = isDeleted;
         this.createdAt = createdAt;
+        this.genre = genre;
         playlists = new HashSet<>();
-
-        if (genre != null) {
-            this.genre = genre;
-        } else {
-            this.genre = new Genre("none");
-        }
     }
 
     public Song () {}

@@ -40,11 +40,4 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username or email is already exists", exc);
         }
     }
-
-//    @GetMapping("/verify/{token}")
-//    public HttpStatus verifyAccount(@PathVariable String token) {
-//        userService.verifyAccount(token);
-//
-//        return HttpStatus.OK;
-//    }
 }

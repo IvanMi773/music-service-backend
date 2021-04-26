@@ -107,18 +107,6 @@ public class SongController {
         }
     }
 
-    @PostMapping("/{songId}")
-    public HttpStatus updateSong (@PathVariable Long songId, @RequestBody SongRequestDto songRequestDto) {
-        //Todo: maybe remove
-        try {
-            songService.updateSong(songId, songRequestDto);
-
-            return HttpStatus.OK;
-        } catch (Exception exc) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error when update song", exc);
-        }
-    }
-
     @PostMapping("/{songId}/p/{playlistId}")
     public HttpStatus saveSongToPlaylist (@PathVariable Long songId, @PathVariable Long playlistId) {
         songService.saveSongToPlaylist(songId, playlistId);

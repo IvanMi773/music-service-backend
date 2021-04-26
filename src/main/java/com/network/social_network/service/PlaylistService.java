@@ -21,18 +21,15 @@ public class PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
-    private final SongRepository songRepository;
 
     public PlaylistService(
             PlaylistRepository playlistRepository,
             UserRepository userRepository,
-            FileUploadService fileUploadService,
-            SongRepository songRepository
+            FileUploadService fileUploadService
     ) {
         this.playlistRepository = playlistRepository;
         this.userRepository = userRepository;
         this.fileUploadService = fileUploadService;
-        this.songRepository = songRepository;
     }
 
     public List<PlaylistResponseDto> getAll () {
