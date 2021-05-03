@@ -10,9 +10,6 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
-// elastic
-// Y9Wfh0J4QeY88jv5x8kxe9EJ
-
 @Configuration
 @EnableElasticsearchRepositories(basePackages = "com.network.social_network.repository.elasticsearch")
 @ComponentScan(basePackages = { "con.network.social_network.service.elasticsearch" })

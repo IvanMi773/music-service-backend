@@ -40,7 +40,7 @@ public class PlaylistService {
             for (Song s: playlist.getSongs()) {
                 songs.add(new SongResponseDto(
                         s.getId(),
-                        playlist.getUser().getUsername(),
+                        s.getUser().getUsername(),
                         s.getName(),
                         s.getGenre().getName(),
                         s.getSongFile().getFileName(),

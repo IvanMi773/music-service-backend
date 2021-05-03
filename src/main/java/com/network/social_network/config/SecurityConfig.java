@@ -39,6 +39,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/admin/**").hasAnyAuthority(UserRole.ADMIN.getRole())
                 .anyRequest().authenticated();
 
+        http.requiresChannel()
+                .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
+                .requiresSecure();
+
         http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
     }
 
