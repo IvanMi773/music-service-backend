@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+
+  elk:
+    image: cvazquezlos/elk:2.4.6
+    ports:
+      - 5000:5000
+      - 5601:5601
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - elk-data:/var/lib/elasticsearch
+
+  main:
+    image: myapp-image-name-that-appears-when-you-run-docker-images
+    restart: on-failure
+    depends_on:
+      - elk
+    ports:
+      - 8080:8080
