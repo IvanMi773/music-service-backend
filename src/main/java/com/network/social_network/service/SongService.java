@@ -212,7 +212,9 @@ public class SongService {
         if (genre == null) {
             throw new CustomException("Genre with name " + genreName + " not found", HttpStatus.NOT_FOUND);
         }
-        var songs = songRepository.getSongsByGenreId(genre.getId());
+        var songs = songRepository.getSongsByGenreId(genre.getId()).orElseThrow(
+                () -> new CustomException("Don't find genre with name " + genreName, HttpStatus.NOT_FOUND)
+        );
         var response = new ArrayList<SongResponseDto>();
 
         for (Song s : songs) {
