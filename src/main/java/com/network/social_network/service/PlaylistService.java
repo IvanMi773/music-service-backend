@@ -13,6 +13,7 @@ import com.network.social_network.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -82,6 +83,8 @@ public class PlaylistService {
                     s.getCreatedAt()
             ));
         }
+
+        songs.sort(Collections.reverseOrder());
 
         var playlistDto = new PlaylistResponseDto(
                 playlist.getId(),
