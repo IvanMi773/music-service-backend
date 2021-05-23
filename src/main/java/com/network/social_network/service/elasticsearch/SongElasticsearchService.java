@@ -3,6 +3,7 @@ package com.network.social_network.service.elasticsearch;
 import com.network.social_network.dto.song.SongResponseDto;
 import com.network.social_network.exception.CustomException;
 import com.network.social_network.elasticsearch_models.Song;
+import com.network.social_network.mapper.SongMapper;
 import com.network.social_network.repository.SongRepository;
 import com.network.social_network.repository.elasticsearch.SongElasticsearchRepository;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,16 @@ public class SongElasticsearchService {
 
     private final SongElasticsearchRepository songElasticsearchRepository;
     private final SongRepository songRepository;
+    private final SongMapper songMapper;
 
-    public SongElasticsearchService(SongElasticsearchRepository songElasticsearchRepository, SongRepository songRepository) {
+    public SongElasticsearchService (
+            SongElasticsearchRepository songElasticsearchRepository,
+            SongRepository songRepository,
+            SongMapper songMapper
+    ) {
         this.songElasticsearchRepository = songElasticsearchRepository;
         this.songRepository = songRepository;
+        this.songMapper = songMapper;
     }
 
     public void removeAll () {
@@ -29,10 +36,7 @@ public class SongElasticsearchService {
 
     public void saveAll (List<com.network.social_network.model.Song> songs) {
         for ( var s : songs) {
-            songElasticsearchRepository.save(new com.network.social_network.elasticsearch_models.Song(
-                    s.getId(),
-                    s.getName()
-            ));
+            songElasticsearchRepository.save(songMapper.songToElasticSearchSong(s));
         }
     }
 
@@ -47,17 +51,8 @@ public class SongElasticsearchService {
             var song = songRepository.findById(s.getId()).orElseThrow(
                     () -> new CustomException("Song not found", HttpStatus.NOT_FOUND)
             );
-            songResponseDtos.add(new SongResponseDto(
-                    song.getId(),
-                    song.getUser().getUsername(),
-                    song.getName(),
-                    song.getGenre().getName(),
-                    song.getSongFile().getFileName(),
-                    song.getSongFile().getDuration(),
-                    song.getLikes(),
-                    song.getCover(),
-                    song.getCreatedAt()
-            ));
+
+            songResponseDtos.add(songMapper.songToSongResponseDto(song));
         }
 
         songResponseDtos.sort(Collections.reverseOrder());

@@ -4,11 +4,12 @@ import com.network.social_network.dto.playlist.PlaylistDto;
 import com.network.social_network.dto.playlist.PlaylistResponseDto;
 import com.network.social_network.dto.song.SongResponseDto;
 import com.network.social_network.exception.CustomException;
+import com.network.social_network.mapper.PlaylistMapper;
+import com.network.social_network.mapper.SongMapper;
 import com.network.social_network.model.PlayListState;
 import com.network.social_network.model.Playlist;
 import com.network.social_network.model.Song;
 import com.network.social_network.repository.PlaylistRepository;
-import com.network.social_network.repository.SongRepository;
 import com.network.social_network.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,15 +23,21 @@ public class PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
+    private final SongMapper songMapper;
+    private final PlaylistMapper playlistMapper;
 
-    public PlaylistService(
+    public PlaylistService (
             PlaylistRepository playlistRepository,
             UserRepository userRepository,
-            FileUploadService fileUploadService
+            FileUploadService fileUploadService,
+            SongMapper songMapper,
+            PlaylistMapper playlistMapper
     ) {
         this.playlistRepository = playlistRepository;
         this.userRepository = userRepository;
         this.fileUploadService = fileUploadService;
+        this.songMapper = songMapper;
+        this.playlistMapper = playlistMapper;
     }
 
     public List<PlaylistResponseDto> getAll () {
@@ -39,27 +46,10 @@ public class PlaylistService {
         for (var playlist : playlistRepository.findAll()) {
             var songs = new ArrayList<SongResponseDto>();
             for (Song s: playlist.getSongs()) {
-                songs.add(new SongResponseDto(
-                        s.getId(),
-                        s.getUser().getUsername(),
-                        s.getName(),
-                        s.getGenre().getName(),
-                        s.getSongFile().getFileName(),
-                        s.getSongFile().getDuration(),
-                        s.getLikes(),
-                        s.getCover(),
-                        s.getCreatedAt()
-                ));
+                songs.add(songMapper.songToSongResponseDto(s));
             }
 
-            playlistResponseDtoList.add(new PlaylistResponseDto(
-                    playlist.getId(),
-                    playlist.getName(),
-                    playlist.getPhoto(),
-                    songs,
-                    playlist.getUser().getUsername(),
-                    playlist.getState().name()
-            ));
+            playlistResponseDtoList.add(playlistMapper.playlistToPlaylistResponseDto(playlist, songs));
         }
         return playlistResponseDtoList;
     }
@@ -71,31 +61,12 @@ public class PlaylistService {
 
         var songs = new ArrayList<SongResponseDto>();
         for (Song s: playlist.getSongs()) {
-            songs.add(new SongResponseDto(
-                    s.getId(),
-                    playlist.getUser().getUsername(),
-                    s.getName(),
-                    s.getGenre().getName(),
-                    s.getSongFile().getFileName(),
-                    s.getSongFile().getDuration(),
-                    s.getLikes(),
-                    s.getCover(),
-                    s.getCreatedAt()
-            ));
+            songs.add(songMapper.songToSongResponseDto(s));
         }
 
         songs.sort(Collections.reverseOrder());
 
-        var playlistDto = new PlaylistResponseDto(
-                playlist.getId(),
-                playlist.getName(),
-                playlist.getPhoto(),
-                songs,
-                playlist.getUser().getUsername(),
-                playlist.getState().name()
-        );
-
-        return playlistDto;
+        return playlistMapper.playlistToPlaylistResponseDto(playlist, songs);
     }
 
     public void deletePlaylistById (Long playlistId) {
@@ -140,14 +111,7 @@ public class PlaylistService {
 
         for (Playlist p: user.getPlaylists()) {
 
-            playlists.add(new PlaylistResponseDto(
-                 p.getId(),
-                 p.getName(),
-                 p.getPhoto(),
-                 null,
-                 username,
-                 p.getState().name()
-            ));
+            playlists.add(playlistMapper.playlistToPlaylistResponseDto(p, null));
         }
 
         return playlists;

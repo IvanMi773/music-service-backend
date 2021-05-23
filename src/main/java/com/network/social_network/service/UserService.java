@@ -4,6 +4,7 @@ import com.network.social_network.dto.user.UserRegistrationDto;
 import com.network.social_network.dto.user.UserProfileDto;
 import com.network.social_network.dto.user.UserUpdateDto;
 import com.network.social_network.exception.CustomException;
+import com.network.social_network.mapper.UserMapper;
 import com.network.social_network.model.*;
 import com.network.social_network.repository.PlaylistRepository;
 import com.network.social_network.repository.UserRepository;
@@ -33,8 +34,9 @@ public class UserService {
     private final FileUploadService fileUploadService;
     private final UserElasticSearchService userElasticSearchService;
     private final PlaylistService playlistService;
+    private final UserMapper userMapper;
 
-    public UserService(
+    public UserService (
             UserRepository userRepository,
             PlaylistRepository playlistRepository,
             JwtTokenProvider jwtTokenProvider,
@@ -42,7 +44,8 @@ public class UserService {
             AuthenticationManager authenticationManager,
             FileUploadService fileUploadService,
             UserElasticSearchService userElasticSearchService,
-            PlaylistService playlistService
+            PlaylistService playlistService,
+            UserMapper userMapper
     ) {
         this.userRepository = userRepository;
         this.playlistRepository = playlistRepository;
@@ -52,6 +55,7 @@ public class UserService {
         this.fileUploadService = fileUploadService;
         this.userElasticSearchService = userElasticSearchService;
         this.playlistService = playlistService;
+        this.userMapper = userMapper;
     }
 
     public String login(String username, String password) {
@@ -66,17 +70,11 @@ public class UserService {
     }
 
     public String register (UserRegistrationDto userRegistrationDto) {
-        if (!userRepository.existsByUsername(userRegistrationDto.getUsername()) && !userRepository.existsByEmail(userRegistrationDto.getEmail())) {
-            var user = new User(
-                    userRegistrationDto.getEmail(),
-                    userRegistrationDto.getUsername(),
-                    passwordEncoder.encode(userRegistrationDto.getPassword()),
-                    userRegistrationDto.getFirstName(),
-                    userRegistrationDto.getLastName(),
-                    "default_user.png",
-                    userRegistrationDto.getRole() == 0 ? UserRole.ADMIN.getRole() : UserRole.USER.getRole(),
-                    false
-            );
+        if (
+                !userRepository.existsByUsername(userRegistrationDto.getUsername()) &&
+                !userRepository.existsByEmail(userRegistrationDto.getEmail())
+        ) {
+            var user = userMapper.userRegistrationDtoToUser(userRegistrationDto, passwordEncoder);
             userRepository.save(user);
 
             userElasticSearchService.save(new com.network.social_network.elasticsearch_models.User(
@@ -111,38 +109,13 @@ public class UserService {
         userRepository.save(channel);
         userElasticSearchService.update(channel.getUsername(), channel);
 
-        var userProfileDto = new UserProfileDto(
-                channel.getId(),
-                channel.getUsername(),
-                channel.getFirstName(),
-                channel.getLastName(),
-                channel.getSubscriptions(),
-                channel.getSubscribers(),
-                channel.getPlaylists().get(0).getSongs().size(),
-                channel.getEmail(),
-                channel.getAvatar(),
-                channel.getRole()
-        );
-
-        return userProfileDto;
+        return userMapper.userToUserProfileDto(channel);
     }
 
     public UserProfileDto getUserProfileDtoByUsername (String username) {
         var user = userRepository.findByUsername(username);
-        var userProfileDto = new UserProfileDto(
-                user.getId(),
-                user.getUsername(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getSubscriptions(),
-                user.getSubscribers(),
-                user.getPlaylists().get(0).getSongs().size(),
-                user.getEmail(),
-                user.getAvatar(),
-                user.getRole()
-        );
 
-        return userProfileDto;
+        return userMapper.userToUserProfileDto(user);
     }
 
     public void updateUser (String username, UserUpdateDto user) {
@@ -166,7 +139,7 @@ public class UserService {
         for (var playlist: user.getPlaylists()) {
             playlistService.deletePlaylistById(playlist.getId());
         }
-        user.setDeleted(true);
+        user.setIsDeleted(true);
         userRepository.save(user);
         userElasticSearchService.removeAll();
         userElasticSearchService.saveAll(userRepository.findAll());
@@ -176,18 +149,7 @@ public class UserService {
         var usersProfiles = new ArrayList<UserProfileDto>();
 
         for (var user : userRepository.findAll()) {
-            usersProfiles.add(new UserProfileDto(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getSubscriptions(),
-                    user.getSubscribers(),
-                    user.getPlaylists().get(0).getSongs().size(),
-                    user.getEmail(),
-                    user.getAvatar(),
-                    user.getRole()
-            ));
+            usersProfiles.add(userMapper.userToUserProfileDto(user));
         }
 
         return usersProfiles;

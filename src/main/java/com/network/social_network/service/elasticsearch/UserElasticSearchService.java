@@ -2,6 +2,7 @@ package com.network.social_network.service.elasticsearch;
 
 import com.network.social_network.dto.user.UserProfileDto;
 import com.network.social_network.elasticsearch_models.User;
+import com.network.social_network.mapper.UserMapper;
 import com.network.social_network.repository.UserRepository;
 import com.network.social_network.repository.elasticsearch.UserElasticSearchRepository;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,16 @@ public class UserElasticSearchService {
 
     private final UserElasticSearchRepository userElasticSearchRepository;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserElasticSearchService(UserElasticSearchRepository userElasticSearchRepository, UserRepository userRepository) {
+    public UserElasticSearchService (
+            UserElasticSearchRepository userElasticSearchRepository,
+            UserRepository userRepository,
+            UserMapper userMapper
+    ) {
         this.userElasticSearchRepository = userElasticSearchRepository;
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     public void update (String username, com.network.social_network.model.User user) {
@@ -37,18 +44,7 @@ public class UserElasticSearchService {
 
         for (var u : this.userElasticSearchRepository.findByUsername(username)) {
             var user = userRepository.findByUsername(u.getUsername());
-            userDtos.add(new UserProfileDto(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getSubscriptions(),
-                    user.getSubscribers(),
-                    user.getPlaylists().get(0).getSongs().size(),
-                    user.getEmail(),
-                    user.getAvatar(),
-                    user.getRole()
-            ));
+            userDtos.add(userMapper.userToUserProfileDto(user));
         }
 
         return userDtos;
@@ -60,10 +56,7 @@ public class UserElasticSearchService {
 
     public void saveAll (List<com.network.social_network.model.User> users) {
         for ( var u : users) {
-            userElasticSearchRepository.save(new User(
-                    u.getId(),
-                    u.getUsername()
-            ));
+            userElasticSearchRepository.save(userMapper.userToElasticSearchUser(u));
         }
     }
 }

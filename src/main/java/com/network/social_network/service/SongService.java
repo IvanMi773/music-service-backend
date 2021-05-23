@@ -3,6 +3,7 @@ package com.network.social_network.service;
 import com.network.social_network.dto.song.SongRequestDto;
 import com.network.social_network.dto.song.SongResponseDto;
 import com.network.social_network.exception.CustomException;
+import com.network.social_network.mapper.SongMapper;
 import com.network.social_network.model.Song;
 import com.network.social_network.model.User;
 import com.network.social_network.repository.*;
@@ -25,14 +26,16 @@ public class SongService {
     private final FileUploadService fileUploadService;
     private final SongElasticsearchService songElasticsearchService;
     private final PlaylistRepository playlistRepository;
+    private final SongMapper songMapper;
 
-    public SongService(
+    public SongService (
             SongRepository songRepository,
             UserRepository userRepository,
             GenreRepository genreRepository,
             FileUploadService fileUploadService,
             SongElasticsearchService songElasticsearchService,
-            PlaylistRepository playlistRepository
+            PlaylistRepository playlistRepository,
+            SongMapper songMapper
     ) {
         this.songRepository = songRepository;
         this.userRepository = userRepository;
@@ -40,6 +43,7 @@ public class SongService {
         this.fileUploadService = fileUploadService;
         this.songElasticsearchService = songElasticsearchService;
         this.playlistRepository = playlistRepository;
+        this.songMapper = songMapper;
     }
 
     public ArrayList<SongResponseDto> getAll () {
@@ -56,17 +60,7 @@ public class SongService {
             var uploadPlaylist = user.getPlaylists().get(0);
 
             for (Song song : uploadPlaylist.getSongs()) {
-                var songDto = new SongResponseDto(
-                        song.getId(),
-                        user.getUsername(),
-                        song.getName(),
-                        song.getGenre().getName(),
-                        song.getSongFile().getFileName(),
-                        song.getSongFile().getDuration(),
-                        song.getLikes(),
-                        song.getCover(),
-                        song.getCreatedAt()
-                );
+                var songDto = songMapper.songToSongResponseDto(song);
                 songs.add(songDto);
             }
         }
@@ -82,19 +76,7 @@ public class SongService {
         var songs = new ArrayList<SongResponseDto>();
 
         for (Song song : uploadPlaylist.getSongs()) {
-            songs.add(
-                    new SongResponseDto(
-                            song.getId(),
-                            username,
-                            song.getName(),
-                            song.getGenre().getName(),
-                            song.getSongFile().getFileName(),
-                            song.getSongFile().getDuration(),
-                            song.getLikes(),
-                            song.getCover(),
-                            song.getCreatedAt()
-                    )
-            );
+            songs.add(songMapper.songToSongResponseDto(song));
         }
 
         songs.sort(Collections.reverseOrder());
@@ -154,17 +136,7 @@ public class SongService {
 
         songRepository.save(song);
 
-        return new SongResponseDto(
-                song.getId(),
-                username,
-                song.getName(),
-                song.getGenre().getName(),
-                song.getSongFile().getFileName(),
-                song.getSongFile().getDuration(),
-                song.getLikes(),
-                song.getCover(),
-                song.getCreatedAt()
-        );
+        return songMapper.songToSongResponseDto(song);
     }
 
     public List<SongResponseDto> getSubscriptionsSongs (String username) {
@@ -174,18 +146,7 @@ public class SongService {
 
         for (User u : user.getSubscriptions()) {
             for (Song s : u.getPlaylists().get(0).getSongs()) {
-                songs.add(new SongResponseDto(
-                        s.getId(),
-                        u.getUsername(),
-                        s.getName(),
-                        s.getGenre().getName(),
-                        s.getSongFile().getFileName(),
-                        s.getSongFile().getDuration(),
-                        s.getLikes(),
-                        s.getCover(),
-                        s.getCreatedAt()
-                    )
-                );
+                songs.add(songMapper.songToSongResponseDto(s));
             }
         }
 
@@ -218,18 +179,7 @@ public class SongService {
         var response = new ArrayList<SongResponseDto>();
 
         for (Song s : songs) {
-            response.add(new SongResponseDto(
-                    s.getId(),
-                    s.getUser().getUsername(),
-                    s.getName(),
-                    s.getGenre().getName(),
-                    s.getSongFile().getFileName(),
-                    s.getSongFile().getDuration(),
-                    s.getLikes(),
-                    s.getCover(),
-                    s.getCreatedAt()
-                )
-            );
+            response.add(songMapper.songToSongResponseDto(s));
         }
 
         response.sort(Collections.reverseOrder());
