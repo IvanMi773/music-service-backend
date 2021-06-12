@@ -47,22 +47,11 @@ public class SongService {
     }
 
     public ArrayList<SongResponseDto> getAll () {
-        //Todo: optimise request [just get user playlists]
-        //Todo: reorder list from newest to oldest
-        var users = userRepository.findAll();
         var songs = new ArrayList<SongResponseDto>();
 
-        for (User user : users) {
-            if (user.getPlaylists().size() <= 0) {
-                continue;
-            }
-
-            var uploadPlaylist = user.getPlaylists().get(0);
-
-            for (Song song : uploadPlaylist.getSongs()) {
-                var songDto = songMapper.songToSongResponseDto(song);
-                songs.add(songDto);
-            }
+        for (Song song : songRepository.findAll()) {
+            var songDto = songMapper.songToSongResponseDto(song);
+            songs.add(songDto);
         }
 
         songs.sort(Collections.reverseOrder());

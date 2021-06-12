@@ -107,6 +107,7 @@ public class UserService {
         }
 
         userRepository.save(channel);
+        userRepository.save(subscriber);
         userElasticSearchService.update(channel.getUsername(), channel);
 
         return userMapper.userToUserProfileDto(channel);

@@ -8,5 +8,4 @@ import java.util.List;
 public interface GenreRepository extends JpaRepository<Genre, Long> {
 
     Genre getGenreByName (String name);
-    List<Genre> getAllGenresByName (String name);
 }

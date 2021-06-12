@@ -18,8 +18,8 @@ public class GenreService {
     }
 
     public void create (String name) {
-        var genres = genreRepository.getAllGenresByName(name);
-        if (genres.isEmpty()) {
+        var genreFromDB = genreRepository.getGenreByName(name);
+        if (genreFromDB == null) {
             var genre = new Genre(name);
             genreRepository.save(genre);
         } else {

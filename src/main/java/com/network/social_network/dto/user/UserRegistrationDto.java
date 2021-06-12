@@ -9,7 +9,14 @@ public class UserRegistrationDto {
     private String lastName;
     private Integer role;
 
-    public UserRegistrationDto(String username, String email, String password, String firstName, String lastName, Integer role) {
+    public UserRegistrationDto(
+            String username,
+            String email,
+            String password,
+            String firstName,
+            String lastName,
+            Integer role
+    ) {
         this.username = username;
         this.email = email;
         this.password = password;

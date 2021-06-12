@@ -16,13 +16,13 @@ public class Playlist {
     private Long id;
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     private String name;
 
-    @ManyToMany(mappedBy = "playlists")
+    @ManyToMany(mappedBy = "playlists", fetch = FetchType.EAGER)
     private Set<Song> songs = new HashSet<>();
 
     private String photoFile;

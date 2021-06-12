@@ -5,13 +5,17 @@ import com.network.social_network.model.SongFile;
 import com.network.social_network.repository.FilesRepository;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,12 +30,20 @@ public class FileUploadService {
     private final Path playlistPhotos = Paths.get("uploads/playlist_photos");
     private final Path userAvatars = Paths.get("uploads/avatars");
     private final Path songCover = Paths.get("uploads/covers");
+    private final Environment environment;
 
     private final Path songs = Paths.get("uploads/songs");
     private final String fileExpansion = ".mp3";
 
-    public FileUploadService(FilesRepository filesRepository) {
+    @Value("upload.path")
+    private String pathToSave;
+
+    public FileUploadService (
+            FilesRepository filesRepository,
+            Environment environment
+    ) {
         this.filesRepository = filesRepository;
+        this.environment = environment;
     }
 
     public String savePlaylistPhoto (MultipartFile file) {
@@ -46,7 +58,7 @@ public class FileUploadService {
         return savePhoto(file, songCover);
     }
 
-    public String savePhoto (MultipartFile file, Path root) {
+    private String savePhoto (MultipartFile file, Path root) {
         createRootDirectory(root);
 
         try {
@@ -67,22 +79,23 @@ public class FileUploadService {
         }
     }
 
-    private static BufferedImage cropImage (BufferedImage bufferedImage, int x, int y, int width, int height) {
-        BufferedImage croppedImage = bufferedImage.getSubimage(x, y, width, height);
-        return croppedImage;
-    }
-
     public SongFile saveSong (MultipartFile file) {
-        createRootDirectory(songs);
+        if (file.isEmpty()) {
+            System.out.println("empty file");
+//            throw new FileEmptyException();
+        }
 
+        String path = "/home/ivan/Projects/music_service_backend/uploads/";
+        System.out.println(pathToSave);
+        String filename = UUID.randomUUID() + file.getOriginalFilename();
         try {
-            String filename = UUID.randomUUID() + fileExpansion;
-            String path = songs + "/" + filename;
-            Files.write(Paths.get(path), file.getBytes());
+            byte[] bytes = file.getBytes();
+            var fileToSave = new File(path, filename);
+            BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(fileToSave));
+            stream.write(bytes);
+            stream.close();
 
-            File target = new File("/home/ivan/projects/music_service/music-service-backend/" + path);
-
-            AudioFile audioFile = AudioFileIO.read(target);
+            AudioFile audioFile = AudioFileIO.read(fileToSave);
             int duration = audioFile.getAudioHeader().getTrackLength();
 
             SongFile model = new SongFile(filename, duration);
@@ -90,8 +103,7 @@ public class FileUploadService {
 
             return model;
         } catch (Exception e) {
-            //Todo: change exception
-            throw new CustomException("Saving song error", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
