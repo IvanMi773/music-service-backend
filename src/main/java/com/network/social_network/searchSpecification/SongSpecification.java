@@ -1,0 +1,36 @@
+package com.network.social_network.searchSpecification;
+
+import com.network.social_network.model.SearchCriteria;
+import com.network.social_network.model.Song;
+import org.springframework.data.jpa.domain.Specification;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+public class SongSpecification implements Specification<Song> {
+
+    private final SearchCriteria searchCriteria;
+
+    public SongSpecification (SearchCriteria searchCriteria) {
+        this.searchCriteria = searchCriteria;
+    }
+
+    @Override
+    public Predicate toPredicate (Root<Song> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+        if (searchCriteria.getOperation().equalsIgnoreCase(">")) {
+            return criteriaBuilder.greaterThanOrEqualTo(root.get(searchCriteria.getKey()), searchCriteria.getValue().toString());
+        } else if (searchCriteria.getOperation().equalsIgnoreCase("<")) {
+            return criteriaBuilder.lessThanOrEqualTo(root.get(searchCriteria.getKey()), searchCriteria.getValue().toString());
+        } else if (searchCriteria.getOperation().equalsIgnoreCase(":")) {
+            if (root.get(searchCriteria.getKey()).getJavaType() == String.class) {
+                return criteriaBuilder.like(root.get(searchCriteria.getKey()), "%" + searchCriteria.getValue() + "%");
+            } else {
+                return criteriaBuilder.equal(root.get(searchCriteria.getKey()), searchCriteria.getValue());
+            }
+        }
+
+        return null;
+    }
+}

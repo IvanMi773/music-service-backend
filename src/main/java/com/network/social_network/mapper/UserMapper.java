@@ -24,6 +24,4 @@ public interface UserMapper {
 
     @Mapping(target = "tracks", expression = "java(user.getPlaylists().size() >= 1 ? user.getPlaylists().get(0).getSongs().size() : 0)")
     UserProfileDto userToUserProfileDto (User user);
-
-    com.network.social_network.elasticsearch_models.User userToElasticSearchUser (User user);
 }

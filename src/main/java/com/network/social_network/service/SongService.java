@@ -8,7 +8,7 @@ import com.network.social_network.model.Song;
 import com.network.social_network.model.User;
 import com.network.social_network.repository.*;
 import com.network.social_network.repository.SongRepository;
-import com.network.social_network.service.elasticsearch.SongElasticsearchService;
+import com.network.social_network.service.search.SongSearchService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class SongService {
     private final UserRepository userRepository;
     private final GenreRepository genreRepository;
     private final FileUploadService fileUploadService;
-    private final SongElasticsearchService songElasticsearchService;
+    private final SongSearchService songElasticsearchService;
     private final PlaylistRepository playlistRepository;
     private final SongMapper songMapper;
 
@@ -33,7 +33,7 @@ public class SongService {
             UserRepository userRepository,
             GenreRepository genreRepository,
             FileUploadService fileUploadService,
-            SongElasticsearchService songElasticsearchService,
+            SongSearchService songElasticsearchService,
             PlaylistRepository playlistRepository,
             SongMapper songMapper
     ) {
@@ -90,11 +90,6 @@ public class SongService {
         song.addPlaylist(user.getPlaylists().get(0));
 
         song = songRepository.save(song);
-
-        songElasticsearchService.save(new com.network.social_network.elasticsearch_models.Song(
-                song.getId(),
-                song.getName()
-        ));
     }
 
     public void deleteSongById (Long songId) {
@@ -104,8 +99,6 @@ public class SongService {
 
         song.setDeleted(true);
         songRepository.save(song);
-        songElasticsearchService.removeAll();
-        songElasticsearchService.saveAll(songRepository.findAll());
     }
 
     public SongResponseDto updateLikesOfSong (Long songId, String username) {

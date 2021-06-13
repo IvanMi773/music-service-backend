@@ -13,6 +13,4 @@ public interface SongMapper {
     @Mapping(target = "file", expression = "java(song.getSongFile().getFileName())")
     @Mapping(target = "duration", expression = "java(song.getSongFile().getDuration())")
     SongResponseDto songToSongResponseDto (Song song);
-
-    com.network.social_network.elasticsearch_models.Song songToElasticSearchSong(Song song);
 }

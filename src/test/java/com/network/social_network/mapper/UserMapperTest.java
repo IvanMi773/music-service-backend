@@ -85,24 +85,4 @@ class UserMapperTest {
         userRepository.deleteById(user.getId());
         playlistRepository.deleteById(playlistArgumentCaptor.capture().getId());
     }
-
-    @Test
-    void userToElasticSearchUser () {
-        var user = new User(
-                "asdf",
-                "asdf",
-                "asdf",
-                "asdf",
-                "asdf",
-                "asdf",
-                "USER",
-                false
-        );
-
-        var elasticSearchUser = UserMapper.instance.userToElasticSearchUser(user);
-
-        assertThat(elasticSearchUser).isInstanceOf(com.network.social_network.elasticsearch_models.User.class);
-        assertThat(elasticSearchUser.getId()).isEqualTo(user.getId());
-        assertThat(elasticSearchUser.getUsername()).isEqualTo(user.getEmail());
-    }
 }

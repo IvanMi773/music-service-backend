@@ -9,7 +9,7 @@ import com.network.social_network.model.*;
 import com.network.social_network.repository.PlaylistRepository;
 import com.network.social_network.repository.UserRepository;
 import com.network.social_network.jwt.JwtTokenProvider;
-import com.network.social_network.service.elasticsearch.UserElasticSearchService;
+import com.network.social_network.service.search.UserSearchService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,7 +32,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final FileUploadService fileUploadService;
-    private final UserElasticSearchService userElasticSearchService;
     private final PlaylistService playlistService;
     private final UserMapper userMapper;
 
@@ -43,7 +42,6 @@ public class UserService {
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
             FileUploadService fileUploadService,
-            UserElasticSearchService userElasticSearchService,
             PlaylistService playlistService,
             UserMapper userMapper
     ) {
@@ -53,7 +51,6 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.fileUploadService = fileUploadService;
-        this.userElasticSearchService = userElasticSearchService;
         this.playlistService = playlistService;
         this.userMapper = userMapper;
     }
@@ -76,11 +73,6 @@ public class UserService {
         ) {
             var user = userMapper.userRegistrationDtoToUser(userRegistrationDto, passwordEncoder);
             userRepository.save(user);
-
-            userElasticSearchService.save(new com.network.social_network.elasticsearch_models.User(
-                    user.getId(),
-                    user.getUsername()
-            ));
 
             var uploadsPlaylist = new Playlist(user, "Uploads", "default.png", PlayListState.TECHNICAL, false);
             var likedPlaylist = new Playlist(user, "Liked", "liked.png", PlayListState.TECHNICAL, false);
@@ -108,7 +100,6 @@ public class UserService {
 
         userRepository.save(channel);
         userRepository.save(subscriber);
-        userElasticSearchService.update(channel.getUsername(), channel);
 
         return userMapper.userToUserProfileDto(channel);
     }
@@ -132,7 +123,6 @@ public class UserService {
         userToUpdate.setLastName(user.getLastName());
 
         userRepository.save(userToUpdate);
-        userElasticSearchService.update(username, userToUpdate);
     }
 
     public void delete (String username) {
@@ -142,8 +132,6 @@ public class UserService {
         }
         user.setIsDeleted(true);
         userRepository.save(user);
-        userElasticSearchService.removeAll();
-        userElasticSearchService.saveAll(userRepository.findAll());
     }
 
     public List<UserProfileDto> getAll() {
